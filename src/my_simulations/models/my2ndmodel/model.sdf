@@ -1,12 +1,16 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <model name="big_car">
+  <model name="my2ndmodel">
     <static>false</static>
     <link name="link">
       <collision name="collision">
         <geometry>
+          <!-- <mesh>
+            <uri>model://meshes/whell_left.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh> -->
           <box>
-            <size>3 2 5</size>
+            <size>1 1 5</size>
           </box>
         </geometry>
         <surface>
@@ -20,8 +24,12 @@
       </collision>
       <visual name="visual">
         <geometry>
+          <!-- <mesh>
+            <uri>model://meshes/whell_left.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh> -->
           <box>
-            <size>3 2 5</size>
+            <size>1 1 5</size>
           </box>
         </geometry>
         <material>

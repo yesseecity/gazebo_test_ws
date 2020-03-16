@@ -5,6 +5,10 @@
     <link name="link">
       <collision name="collision">
         <geometry>
+          <!-- <mesh>
+            <uri>model://meshes/whell_left.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh> -->
           <box>
             <size>3 2 5</size>
           </box>
@@ -20,6 +24,10 @@
       </collision>
       <visual name="visual">
         <geometry>
+          <!-- <mesh>
+            <uri>model://meshes/whell_left.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh> -->
           <box>
             <size>3 2 5</size>
           </box>
