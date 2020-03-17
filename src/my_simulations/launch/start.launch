@@ -7,6 +7,7 @@
   <arg name="paused" default="false" />
   <arg name="recording" default="false" />
   <arg name="world" default="$(find my_simulations)/worlds/empty.world" />
+  <arg name="physics" default="ode"/>
 
   <!-- include gazebo_ros launcher -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -16,6 +17,12 @@
     <arg name="gui" value="$(arg gui)"/>
     <arg name="paused" value="$(arg paused)"/>
     <arg name="use_sim_time" value="true"/>
+    <arg name="physics" value="$(arg physics)"/>
   </include>
   
+  <!-- <node name="join_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="True" />
+  </node> -->
+
+  <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" /> -->
 </launch>

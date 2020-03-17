@@ -8,17 +8,37 @@
       <uri>model://ground_plane</uri>
     </include>
    
-    <include>
-      <!-- <uri>model://my1stmodel</uri> -->
-      <!-- <uri>model://my2ndmodel</uri> -->
-      <uri>model://my3rdmodel</uri>
+    <!-- <include>
+      <uri>model://my1stmodel</uri>
       <static>true</static>
+      <pose>0 0 0 0 0 0</pose>
+    </include> -->
+
+    <!-- <include>
+      <uri>model://simple_gripper</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include> -->
+
+    <include>
+      <uri>model://amr_car</uri>
+      <!-- <static>true</static> -->
       <pose>0 0 0 0 0 0</pose>
     </include>
 
 
     <!-- <include>
-      <uri>model://first_2015_trash_can</uri>
+      <uri>model://hokuyo</uri>
+      <pose>0 -0.295 0.24 0 0 0</pose>
+    </include>
+    <joint name="hokuyo_joint" type="fixed">
+      <child>hokuyo::link</child>
+      <parent>chassis</parent>
+    </joint> -->
+
+    <!-- <include>
+      <uri>model://my3rdmodel</uri>
+      <static>true</static>
+      <pose>2 -2.2 0 0 0 0</pose>
     </include> -->
   </world>
 </sdf>
