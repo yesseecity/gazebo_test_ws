@@ -116,6 +116,31 @@
         <xyz>1 0 0</xyz>
       </axis>
     </joint>
+    <plugin name="left_wheel_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <odometrySource>world</odometrySource>
+      <publishOdomTF>true</publishOdomTF>
+      <publishWheelTF>false</publishWheelTF>
+      <publishTf>true</publishTf>
+      <publishWheelJointState>true</publishWheelJointState>
+      <legacyMode>false</legacyMode>
+      
+      <wheelAcceleration>1</wheelAcceleration>
+      <wheelTorque>10</wheelTorque>
+      <rosDebugLevel>na</rosDebugLevel>
+
+
+      <alwaysOn>true</alwaysOn>
+      <updateRate>30</updateRate>
+      <leftJoint>left_wheel_hinge</leftJoint>
+      <rightJoint>right_wheel_hinge</rightJoint>
+      <wheelSeparation>0.5380</wheelSeparation>
+      <wheelDiameter>0.2410</wheelDiameter>
+      <torque>20</torque>
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+    </plugin>
 
     <!-- caster -->
     <link name="front_caster">
@@ -233,7 +258,7 @@
             <resolution>0.01</resolution>
           </range>
         </ray>
-        <plugin name="laser" filename="libRayPlugin.so" />
+        <plugin name="laser" filename="libgazebo_ros_laser.so" />
         <always_on>1</always_on>
         <update_rate>30</update_rate>
         <visualize>true</visualize>
