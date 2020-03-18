@@ -173,8 +173,8 @@
             <horizontal>
               <samples>640</samples>
               <resolution>1</resolution>
-              <min_angle>3.14159</min_angle>
-              <max_angle>6.283185</max_angle>
+              <min_angle>3.665191</min_angle>
+              <max_angle>5.759587</max_angle>
             </horizontal>
           </scan>
           <range>
@@ -199,6 +199,65 @@
       <parent>chassis</parent>
     </joint>
 
+    <!-- Camera -->
+    <link name="camera_front">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://amr_car/meshes/camera_front.stl</uri>
+            <scale>0.01 0.01 0.01</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <sensor type="camera" name="camera_front">
+        <pose>0 -0.287 0.257341 0 0 -1.570796</pose>
+        <update_rate>30.0</update_rate>
+        <camera name="camera_frontd">
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>800</width>
+            <height>800</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <!-- Noise is sampled independently per pixel on each frame.
+                That pixel's noise value is added to each of its color
+                channels, which at that point lie in the range [0,1]. -->
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>camera_front</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_frontinfo</cameraInfoTopicName>
+          <frameName>camera_front</frameName>
+          <hackBaseline>0.07</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+      </sensor>
+    </link>
+    <joint type="fixed" name="front_cam_joint">
+      <child>camera_front</child>
+      <parent>chassis</parent>
+    </joint>
 
     <!-- caster -->
     <link name="caster_front">
