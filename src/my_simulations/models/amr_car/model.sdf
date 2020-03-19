@@ -187,7 +187,9 @@
           <gaussianNoise>0.9</gaussianNoise>
           <topicName>scan</topicName>
           <!-- <frameName>base_sacn</frameName> -->
-          <frameName>amr_car</frameName>
+          <!-- <frameName>amr_car</frameName> -->
+          <frameName>laser</frameName>
+          <robotBaseFrame>base_footprint</robotBaseFrame>
           <always_on>1</always_on>
           <update_rate>30</update_rate>
         </plugin>

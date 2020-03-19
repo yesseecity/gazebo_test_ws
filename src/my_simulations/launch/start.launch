@@ -20,6 +20,7 @@
     <arg name="physics" value="$(arg physics)"/>
   </include>
   
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_laser_broadcaster" args=" 0.3 0 0.1 0 0 0 1 base_footprint laser 100"/>
 
   <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
     <param name="joint_state_publisher" value=""/>
