@@ -18,8 +18,6 @@
       <pose>0 -8.3 0 0 0 3.14159</pose>
     </include> -->
     
-    
-
     <include>
       <uri>model://amr_car</uri>
       <!-- <static>true</static> -->

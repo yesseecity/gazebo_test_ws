@@ -2,6 +2,9 @@
 <sdf version="1.5">
   <model name="amr_car">
     <static>false</static>
+
+
+
     <link name="chassis">
       <collision name="collision">
         <geometry>
@@ -13,8 +16,8 @@
         <surface>
           <friction>
             <ode>
-              <mu>100</mu>
-              <mu2>50</mu2>
+              <mu>200</mu>
+              <mu2>200</mu2>
             </ode>
           </friction>
         </surface>
@@ -33,14 +36,17 @@
           </script>
         </material>
       </visual>
+      <inertial>
+        <mass>50</mass>
+      </inertial>
     </link>
     
-    <!-- whell -->
-    <link name="left_wheel">
+    <!-- wheel -->
+    <link name="wheel_left">
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>model://amr_car/meshes/left_wheel.stl</uri>
+            <uri>model://amr_car/meshes/wheel_left.stl</uri>
             <scale>0.01 0.01 0.01</scale>
           </mesh>
         </geometry>
@@ -56,7 +62,7 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>model://amr_car/meshes/left_wheel.stl</uri>
+            <uri>model://amr_car/meshes/wheel_left.stl</uri>
             <scale>0.01 0.01 0.01</scale>
           </mesh>
         </geometry>
@@ -68,11 +74,11 @@
         </material>
       </visual>
     </link>
-    <link name="right_wheel">
+    <link name="wheel_right">
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>model://amr_car/meshes/right_wheel.stl</uri>
+            <uri>model://amr_car/meshes/wheel_right.stl</uri>
             <scale>0.01 0.01 0.01</scale>
           </mesh>
         </geometry>
@@ -88,7 +94,7 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>model://amr_car/meshes/right_wheel.stl</uri>
+            <uri>model://amr_car/meshes/wheel_right.stl</uri>
             <scale>0.01 0.01 0.01</scale>
           </mesh>
         </geometry>
@@ -100,17 +106,17 @@
         </material>
       </visual>
     </link>
-    <joint type="revolute" name="left_wheel_hinge">
-      <pose>0.3 0 0.08 0 0 0</pose>
-      <child>left_wheel</child>
+    <joint type="revolute" name="wheel_left_hinge">
+      <pose>0.3 0 0.075 0 0 0</pose>
+      <child>wheel_left</child>
       <parent>chassis</parent>
       <axis>
         <xyz>1 0 0</xyz>
       </axis>
     </joint>
-    <joint type="revolute" name="right_wheel_hinge">
-      <pose>-0.3 0 0.08 0 0 0</pose>
-      <child>right_wheel</child>
+    <joint type="revolute" name="wheel_right_hinge">
+      <pose>-0.3 0 0.075 0 0 0</pose>
+      <child>wheel_right</child>
       <parent>chassis</parent>
       <axis>
         <xyz>1 0 0</xyz>
@@ -130,8 +136,8 @@
 
       <alwaysOn>true</alwaysOn>
       <updateRate>30</updateRate>
-      <leftJoint>left_wheel_hinge</leftJoint>
-      <rightJoint>right_wheel_hinge</rightJoint>
+      <leftJoint>wheel_left_hinge</leftJoint>
+      <rightJoint>wheel_right_hinge</rightJoint>
       <wheelSeparation>0.55</wheelSeparation>
       <wheelDiameter>0.16</wheelDiameter>
       <torque>20</torque>

@@ -1,4 +1,4 @@
 devel/
 build/
 src/CMakeLists.txt
-.blend1
+*.blend1

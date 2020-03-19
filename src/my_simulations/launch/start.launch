@@ -10,6 +10,7 @@
   <arg name="physics" default="ode"/>
 
   <!-- include gazebo_ros launcher -->
+  <remap from="/amr_car/cmd_vel" to="cmd_vel"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(arg world)"/> 
     <arg name="recording" value="$(arg recording)"/>
