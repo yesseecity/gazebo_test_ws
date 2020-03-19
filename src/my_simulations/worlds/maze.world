@@ -7,13 +7,19 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
-
+  
     <include>
+      <uri>model://maze</uri>
+      <pose>0 0 0.0001 0 0 0</pose>
+    </include>
+  
+    <!-- <include>
       <uri>model://house_1</uri>
       <pose>0 -8.3 0 0 0 3.14159</pose>
-    </include>
+    </include> -->
     
     
+
     <include>
       <uri>model://amr_car</uri>
       <!-- <static>true</static> -->
