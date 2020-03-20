@@ -23,10 +23,10 @@
       <pose>0 -8.3 0 0 0 3.14159</pose>
     </include> -->
     
-    <!-- <include>
+    <include>
       <uri>model://amr_car</uri>
       <pose>1.5 9.8 0.001 0 0 0</pose>
-    </include> -->
+    </include>
     
     <gui fullscreen='0'>
       <camera name='user_camera'>
