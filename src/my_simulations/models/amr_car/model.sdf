@@ -97,7 +97,7 @@
       </visual>
     </link>
     <joint type="revolute" name="wheel_left_hinge">
-      <pose>0.3 0 0.075 0 0 0</pose>
+      <pose>0.275 0 0.075 0 0 0</pose>
       <child>wheel_left</child>
       <parent>chassis</parent>
       <axis>
@@ -105,7 +105,7 @@
       </axis>
     </joint>
     <joint type="revolute" name="wheel_right_hinge">
-      <pose>-0.3 0 0.075 0 0 0</pose>
+      <pose>-0.275 0 0.075 0 0 0</pose>
       <child>wheel_right</child>
       <parent>chassis</parent>
       <axis>
@@ -163,7 +163,7 @@
         </material>
       </visual>
       <sensor type="ray" name="LiDAR">
-        <pose>0 -0.287 0.267341 0 0 0</pose>
+        <pose>0 -0.281012 0.269978 0 0 0</pose>
         <ray>
           <scan>
             <horizontal>
@@ -183,9 +183,9 @@
           <gaussianNoise>0.9</gaussianNoise>
           <topicName>scan</topicName>
           <!-- <frameName>base_sacn</frameName> -->
-          <!-- <frameName>amr_car</frameName> -->
+          <!-- <frameName>/amr_car/base_footprint</frameName> -->
           <frameName>laser</frameName>
-          <robotBaseFrame>base_footprint</robotBaseFrame>
+          <!-- <robotBaseFrame>base_footprint</robotBaseFrame> -->
           <always_on>1</always_on>
           <update_rate>30</update_rate>
         </plugin>

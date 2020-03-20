@@ -21,9 +21,10 @@
     <arg name="physics" value="$(arg physics)"/>
   </include>
 
-  <include file="$(find ds4_driver)/launch/ds4_twist.launch"></include>
+  <!-- <include file="$(find ds4_driver)/launch/ds4_twist.launch"></include> -->
 
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_laser_broadcaster" args=" 0.3 0 0.1 0 0 0 1 base_footprint laser 100"/>
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_laser_broadcaster" 
+    args="0 -0.281012 0.269978 0 0 0 amr_car/base_footprint laser 100"/> -->
 
   <!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find my_simulations)/rviz/config.rviz" /> -->
 </launch>
