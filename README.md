@@ -17,4 +17,10 @@ If you went to used DS4 Controller to your simulation car, you can refrence this
 ```roslaunch my_simulations start.launch```
 
 * DS4 Controller  
-``` roslaunch my_simulations ds4_twist.launch```
+```roslaunch my_simulations ds4_twist.launch```
+
+* Create map
+```roslaunch my_simulations SLAM-gazebo.launch```
+
+* Voice Command
+```roslaunch voice_interaction_robot deploy_voice_interaction.launch```
