@@ -30,7 +30,7 @@ class VoiceCommandTranslator:
     slots = []
 
     def __init__(self):
-        rospy.init_node("voice_command_translator", log_level=rospy.DEBUG)
+        rospy.init_node("voice_command_translator")
         rospy.Subscriber('/voice_interaction_node/fulfilled_command', FulfilledVoiceCommand, self.handle_voice_command)
 
     def run(self):

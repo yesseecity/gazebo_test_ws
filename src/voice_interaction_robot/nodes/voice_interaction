@@ -48,6 +48,7 @@ class WakeWord:
             self.awaken()
 
     def is_awake(self):
+        return True
         return time.time() < self.last_wake_time + self.time_awake
 
     def awaken(self):
@@ -99,9 +100,6 @@ class VoiceInteraction:
             return None
 
         audio_data = request.data
-        rospy.loginfo("============audio_data start=============")
-        rospy.loginfo(audio_data)
-        rospy.loginfo("============audio_data end=============")
         accept_type = 'text/plain; charset=utf-8'
         if use_polly:
             accept_type = 'audio/pcm'
