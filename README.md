@@ -24,3 +24,37 @@ If you went to used DS4 Controller to your simulation car, you can refrence this
 
 * Voice Command
 ```roslaunch voice_interaction_robot deploy_voice_interaction.launch```
+
+
+## Add user on AWS IAM  
+[https://console.aws.amazon.com/iam/home#/users](https://console.aws.amazon.com/iam/home#/users)  
+ 
+Add user
+![AWS Add user](/readme_images/iam_add_user_1.png)  
+
+### Select policy **AmazonPollyFullAccess**
+![AWS Add user](/readme_images/iam_add_user_2.png)
+
+### Select policy **AmazonLexFullAccess**
+![AWS Add user](/readme_images/iam_add_user_3.png)
+
+### Check Permissions
+![AWS Add user](/readme_images/iam_add_user_4.png)
+
+### Take down **Access key ID** and **Secret access key**  
+![AWS Add user](/readme_images/iam_add_user_5.png)  
+
+### Back user list and click user voice_command_user
+![AWS Add user](/readme_images/iam_add_user_6.png)  
+
+### Take down **User ARN**  
+![AWS Add user](/readme_images/iam_add_user_7.png)  
+
+### Add user access info to your ```~/.bashrc``` or ```~/.zshrc```  
+![AWS Add user](/readme_images/iam_add_user_8.png)  
+
+
+### Resource your  ```~/.bashrc``` or ```~/.zshrc```  
+```source ~/.bashrc```  
+or  
+```source ~/.zshrc```  
