@@ -25,7 +25,7 @@
     
     <include>
       <uri>model://amr_car</uri>
-      <pose>1.5 9.8 0.001 0 0 0</pose>
+      <pose>1.5 9.8 0.001 0 0 -1.570796</pose>
     </include>
     
     <gui fullscreen='0'>

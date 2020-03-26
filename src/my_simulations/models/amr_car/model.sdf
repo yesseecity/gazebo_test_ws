@@ -97,19 +97,19 @@
       </visual>
     </link>
     <joint type="revolute" name="wheel_left_hinge">
-      <pose>0.275 0 0.075 0 0 0</pose>
+      <pose>0 0.275 0.075 0 0 0</pose>
       <child>wheel_left</child>
       <parent>chassis</parent>
       <axis>
-        <xyz>1 0 0</xyz>
+        <xyz>0 1 0</xyz>
       </axis>
     </joint>
     <joint type="revolute" name="wheel_right_hinge">
-      <pose>-0.275 0 0.075 0 0 0</pose>
+      <pose>0 -0.275 0.075 0 0 0</pose>
       <child>wheel_right</child>
       <parent>chassis</parent>
       <axis>
-        <xyz>1 0 0</xyz>
+        <xyz>0 1 0</xyz>
       </axis>
     </joint>
     <plugin name="wheel_drive_controller" filename="libgazebo_ros_diff_drive.so">
@@ -163,14 +163,19 @@
         </material>
       </visual>
       <sensor type="ray" name="LiDAR">
-        <pose>0 -0.281012 0.269978 0 0 0</pose>
+        <pose>0.29 0 0.27 0 0 0</pose>
         <ray>
           <scan>
             <horizontal>
-              <samples>640</samples>
+              <samples>360</samples>
               <resolution>1</resolution>
-              <min_angle>3.665191</min_angle>
-              <max_angle>5.759587</max_angle>
+              <!-- -90 ~ 90 -->
+              <min_angle>-1.5707963</min_angle>
+              <max_angle>1.5707963</max_angle>
+
+              <!-- -60 ~ 60 -->
+              <!-- <min_angle>-1.0472</min_angle>
+              <max_angle>1.0472</max_angle> -->
             </horizontal>
           </scan>
           <range>
@@ -214,13 +219,13 @@
         </material>
       </visual>
       <sensor type="camera" name="camera_front">
-        <pose>0 -0.287 0.257341 0 0 -1.570796</pose>
+        <pose>0.33 0 0.13 0 0 -1.570796</pose>
         <update_rate>30.0</update_rate>
         <camera name="camera_front">
           <horizontal_fov>1.3962634</horizontal_fov>
           <image>
             <width>800</width>
-            <height>800</height>
+            <height>600</height>
             <format>R8G8B8</format>
           </image>
           <clip>
@@ -281,13 +286,13 @@
         </material>
       </visual>
       <sensor type="camera" name="camera_back">
-        <pose>0 0.287 0.257341 0 0 1.570796</pose>
+        <pose>-0.33 0 0.13 0 0 1.570796</pose>
         <update_rate>30.0</update_rate>
         <camera name="camera_back">
           <horizontal_fov>1.3962634</horizontal_fov>
           <image>
             <width>800</width>
-            <height>800</height>
+            <height>600</height>
             <format>R8G8B8</format>
           </image>
           <clip>
@@ -323,9 +328,6 @@
       <child>camera_back</child>
       <parent>chassis</parent>
     </joint>
-
-
-
 
     <!-- caster -->
     <link name="caster_front">
