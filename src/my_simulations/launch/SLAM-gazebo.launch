@@ -47,4 +47,9 @@
 
     <param name="minimumScore" value="0"/>
   </node>
+
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find my_simulations)/rviz/config.rviz" />
+	<!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find my_simulations)/maps/maze.yaml">
+    	<param name="frame_id" value="/map"/>
+	</node> -->
 </launch>
