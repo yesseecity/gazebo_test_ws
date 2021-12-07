@@ -32,7 +32,7 @@
     </include> -->
     
     <include>
-      <uri>model://amr</uri>
+      <uri>model://agv</uri>
       <!-- <pose>1.5 9.8 0.001 0 0 0</pose>
       <pose>0 0 0 0 0 1.570796</pose> -->
       <pose>0 0 0 0 0 0</pose>

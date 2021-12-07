@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <model name="amr_car">
+  <model name="agv_car">
     <static>0</static>
 
       <link name="base_footprint">
@@ -25,7 +25,7 @@
         <collision name="base_collision">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/chassis.stl</uri>
+              <uri>model://agv/meshes/chassis.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -34,7 +34,7 @@
         <visual name="base_visual">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/chassis.stl</uri>
+              <uri>model://agv/meshes/chassis.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -53,7 +53,7 @@
         <collision name="wheel_left_collision">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/wheel_left.stl</uri>
+              <uri>model://agv/meshes/wheel_left.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -69,7 +69,7 @@
         <visual name="wheel_left_visual">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/wheel_left.stl</uri>
+              <uri>model://agv/meshes/wheel_left.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -87,7 +87,7 @@
           <collision name="wheel_right_collision">
             <geometry>
               <mesh>
-                <uri>model://amr/meshes/wheel_right.stl</uri>
+                <uri>model://agv/meshes/wheel_right.stl</uri>
                 <scale>1 1 1</scale>
               </mesh>
             </geometry>
@@ -103,7 +103,7 @@
           <visual name="wheel_right_visual">
             <geometry>
               <mesh>
-                <uri>model://amr/meshes/wheel_right.stl</uri>
+                <uri>model://agv/meshes/wheel_right.stl</uri>
                 <scale>1 1 1</scale>
               </mesh>
             </geometry>
@@ -167,7 +167,7 @@
         <collision name="sick_tim551_collision">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/sick_tim551.stl</uri>
+              <uri>model://agv/meshes/sick_tim551.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -176,7 +176,7 @@
         <visual name="sick_tim551_visual">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/sick_tim551.stl</uri>
+              <uri>model://agv/meshes/sick_tim551.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -244,7 +244,7 @@
         <collision name="camera_front_collision">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/camera_front.stl</uri>
+              <uri>model://agv/meshes/camera_front.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -253,7 +253,7 @@
         <visual name="camera_front_visual">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/camera_front.stl</uri>
+              <uri>model://agv/meshes/camera_front.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -315,7 +315,7 @@
         <collision name="camera_back_collision">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/camera_back.stl</uri>
+              <uri>model://agv/meshes/camera_back.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -324,7 +324,7 @@
         <visual name="camera_back_visual">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/camera_back.stl</uri>
+              <uri>model://agv/meshes/camera_back.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -385,7 +385,7 @@
         <collision name="caster_front_collision">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/caster_front.stl</uri>
+              <uri>model://agv/meshes/caster_front.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -402,7 +402,7 @@
         <visual name="caster_front_visual">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/caster_front.stl</uri>
+              <uri>model://agv/meshes/caster_front.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -420,7 +420,7 @@
         <collision name="caster_back_collision">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/caster_back.stl</uri>
+              <uri>model://agv/meshes/caster_back.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -437,7 +437,7 @@
         <visual name="caster_back_visual">
           <geometry>
             <mesh>
-              <uri>model://amr/meshes/caster_back.stl</uri>
+              <uri>model://agv/meshes/caster_back.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
