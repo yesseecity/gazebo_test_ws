@@ -34,10 +34,13 @@
     <include>
       <uri>model://agv</uri>
       <!-- <pose>1.5 9.8 0.001 0 0 0</pose>
-      <pose>0 0 0 0 0 1.570796</pose> -->
+    </include>
+
+    <include>
+      <uri>model://charge_station</uri>
       <pose>0 0 0 0 0 0</pose>
     </include>
-    
+  
     <!-- <gui fullscreen='0'>
       <camera name='user_camera'>
         <pose frame=''>14.904 15.373 21.3272 0 0.825798 -2.3438</pose>

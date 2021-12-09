@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <model name="agv_car">
-    <static>0</static>
+    <static>false</static>
 
       <link name="base_footprint">
         <pose>0 0 0 0 0 0</pose>
@@ -293,7 +293,7 @@
             <updateRate>0.0</updateRate>
             <cameraName>camera_front</cameraName>
             <imageTopicName>image_raw</imageTopicName>
-            <cameraInfoTopicName>camera_front_info</cameraInfoTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
             <frameName>camera_front</frameName>
             <hackBaseline>0.07</hackBaseline>
             <distortionK1>0.0</distortionK1>
@@ -310,7 +310,7 @@
         <parent>base_link</parent>
       </joint>
 
-      <link name="camera_back">
+      <!-- <link name="camera_back">
         <pose>-0.33 0 0.13 0 0 3.1416</pose>
         <collision name="camera_back_collision">
           <geometry>
@@ -351,6 +351,72 @@
             </clip>
             <noise>
               <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.007</stddev>
+            </noise>
+          </camera>
+          <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+            <alwaysOn>true</alwaysOn>
+            <updateRate>0.0</updateRate>
+            <cameraName>camera_back</cameraName>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <frameName>camera_back</frameName>
+            <hackBaseline>0.07</hackBaseline>
+            <distortionK1>0.0</distortionK1>
+            <distortionK2>0.0</distortionK2>
+            <distortionK3>0.0</distortionK3>
+            <distortionT1>0.0</distortionT1>
+            <distortionT2>0.0</distortionT2>
+          </plugin>
+        </sensor>
+      </link> 
+      <joint type="fixed" name="camera_back_joint">
+        <child>camera_back</child>
+        <parent>base_link</parent>
+      </joint>
+      -->
+      <link name="usb_cam">
+        <pose>-0.33 0 0.13 0 0 3.1416</pose>
+        <collision name="usb_cam_collision">
+          <geometry>
+            <mesh>
+              <uri>model://agv/meshes/camera_back.stl</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </collision>
+
+        <visual name="usb_cam_visual">
+          <geometry>
+            <mesh>
+              <uri>model://agv/meshes/camera_back.stl</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+        </visual>
+
+        <sensor type="camera" name="usb_cam">
+          <update_rate>60.0</update_rate>
+          <camera name="usb_cam">
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>300</far>
+            </clip>
+            <noise>
+              <type>gaussian</type>
               <!-- Noise is sampled independently per pixel on each frame.
                   That pixel's noise value is added to each of its color
                   channels, which at that point lie in the range [0,1]. -->
@@ -361,10 +427,10 @@
           <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
             <alwaysOn>true</alwaysOn>
             <updateRate>0.0</updateRate>
-            <cameraName>camera_back</cameraName>
+            <cameraName>usb_cam</cameraName>
             <imageTopicName>image_raw</imageTopicName>
-            <cameraInfoTopicName>camera_back_info</cameraInfoTopicName>
-            <frameName>camera_back</frameName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <frameName>usb_cam</frameName>
             <hackBaseline>0.07</hackBaseline>
             <distortionK1>0.0</distortionK1>
             <distortionK2>0.0</distortionK2>
@@ -374,9 +440,8 @@
           </plugin>
         </sensor>
       </link>
-
-      <joint type="fixed" name="camera_back_joint">
-        <child>camera_back</child>
+      <joint type="fixed" name="usb_cam_joint">
+        <child>usb_cam</child>
         <parent>base_link</parent>
       </joint>
 
