@@ -7,7 +7,11 @@ project(simulations)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  rospy
+  apriltag_ros
+)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -113,7 +117,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-# ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -146,6 +150,10 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
+add_executable(tf_apriltag src/tf_apriltag.cpp)
+target_link_libraries(tf_apriltag 
+  ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############

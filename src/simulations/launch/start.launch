@@ -3,14 +3,18 @@
 <launch>
   <!-- overwritting these args -->
   <arg name="debug" default="false" />
-  <arg name="gui" default="true" />
+  <!-- <arg name="gui" default="true" /> -->
+  <!-- <arg name="paused" default="true" /> -->
+  
+  <arg name="gui" default="false" />
   <arg name="paused" default="false" />
+
   <arg name="recording" default="false" />
   <arg name="world" default="$(find simulations)/worlds/test.world" />
   <arg name="physics" default="ode"/>
 
   <!-- include gazebo_ros launcher -->
-  <remap from="/amr_car/cmd_vel" to="cmd_vel"/>
+  <remap from="/agv_car/cmd_vel" to="cmd_vel"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(arg world)"/> 
     <arg name="recording" value="$(arg recording)"/>
@@ -21,14 +25,45 @@
     <arg name="physics" value="$(arg physics)"/>
   </include>
 
-  <!--static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms-->
-  <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_laser_broadcaster" 
-    args="0.29 0 0.285 0 0 0 amr_car/base_footprint laser 100"/>
-
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find simulations)/maps/maze.yaml">
+    <param name="frame_id" value="/map"/>
+	</node>
+  <node pkg="tf" type="static_transform_publisher" name="map_to_odom" 
+    args="0 0 0 0 0 0  map /agv_car/odom 100"/>
   
-  <!-- <include file="$(find my_simulations)/launch/ds4_twist.launch" ></include> -->
-  <!-- <include file="$(find my_simulations)/launch/SLAM-gazebo.launch" ></include> -->
-	<!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find my_simulations)/maps/maze.yaml">
-    	<param name="frame_id" value="/map"/>
-	</node> -->
+
+  <!-- static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms -->
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_laser_broadcaster" 
+    args="0.29 0 0.285 0 0 0 /agv_car/base_footprint laser 100"/>
+
+
+  <include file="$(find simulations)/launch/ds4.launch" ></include>
+
+  <!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find simulations)/rviz/config.rviz" /> -->
+
+  <!-- <node name="front_cam_view" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/camera_front/image_raw" />
+  </node> -->
+
+  <!-- <node name="back_cam_view" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/usb_cam/image_raw" />
+  </node> -->
+
+  <!-- <node pkg="tf" type="static_transform_publisher" name="apriltag_to_odom" 
+    args="-.5 0 0.2 0 0 0 /agv_car/base_footprint back_cam  100"/>  -->
+    <!-- args="-.5 0 0.2 3.14 0 0 /agv_car/base_footprint back_cam  100"/>  -->
+
+  <node name="cam_calibration" pkg="cam_calibration" type="opencv_testcam" respawn="false">
+    <param name="map1_path" value="$(find cam_calibration)/data/mapb1.txt" />
+    <param name="map2_path" value="$(find cam_calibration)/data/mapb2.txt" />
+  </node>
+  <include file="$(find data)/launch/apriltag.launch" ></include>
+
+  <!-- <node name="tf_apriltag" pkg="simulations" type="tf_apriltag.py" output="log">
+  </node> -->
+
+  <!-- <node name="tag_detections_view" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/tag_detections_image" />
+  </node> -->
+
 </launch>

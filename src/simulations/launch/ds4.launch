@@ -4,9 +4,9 @@
   <include file="$(find ds4_driver)/launch/ds4_driver.launch" ></include>
 
   <node pkg="ds4_driver" type="ds4_twist_node.py" name="ds4_twist" output="screen" >
+    <remap from="cmd_vel" to="/agv_car/cmd_vel"/>
     <rosparam command="load" file="$(find simulations)/config/twist_6dof_car.yaml" />
     <param name="stamped" value="false" />
   </node>
 
-    
 </launch>
