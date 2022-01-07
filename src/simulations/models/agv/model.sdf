@@ -161,7 +161,7 @@
         <robotBaseFrame>base_footprint</robotBaseFrame>
       </plugin>
 
-          <!-- Lidar sick_tim551.stl-->
+      <!-- Lidar sick_tim551.stl-->
       <link name="sick_tim551">
         <pose>0.29 0 0.285 0 0 0</pose>
         <collision name="sick_tim551_collision">

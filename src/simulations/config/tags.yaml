@@ -1,0 +1,9 @@
+standalone_tags:
+  [
+    {id: 0, size: 0.075, name: "A"},
+    {id: 1, size: 0.7, name: B},
+    {id: 2, size: 0.7, name: C},
+    {id: 3, size: 0.7, name: D},
+    {id: 4, size: 0.7, name: E},
+    {id: 5, size: 0.7, name: F}
+  ]

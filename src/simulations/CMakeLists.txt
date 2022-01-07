@@ -103,8 +103,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES simulations
+  INCLUDE_DIRS include
+  # LIBRARIES simulations
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -116,7 +116,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -150,8 +150,8 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_executable(tf_apriltag src/tf_apriltag.cpp)
-target_link_libraries(tf_apriltag 
+add_executable(apriltag_docking_path src/apriltag_docking_path.cpp)
+target_link_libraries(apriltag_docking_path 
   ${catkin_LIBRARIES}
 )
 #############
