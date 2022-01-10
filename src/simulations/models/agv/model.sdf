@@ -3,57 +3,91 @@
   <model name="agv_car">
     <static>false</static>
 
-      <link name="base_footprint">
-        <pose>0 0 0 0 0 0</pose>
-      </link>
+    <link name="base_footprint">
+      <pose>0 0 0 0 0 0</pose>
+    </link>
 
-      <link name="base_link">
-        <pose>0 0 0.2 0 0 0</pose>
-        <inertial>
-          <pose>0 0 0.15 0 0 0</pose>
-          <!-- <inertia>
-            <ixx>0.001</ixx>
-            <ixy>0.000</ixy>
-            <ixz>0.000</ixz>
-            <iyy>0.001</iyy>
-            <iyz>0.000</iyz>
-            <izz>0.001</izz>
-          </inertia> -->
-          <mass>100</mass>
-        </inertial>
+    <link name="base_link">
+      <pose>0 0 0.2 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0.15 0 0 0</pose>
+        <!-- <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0.000</ixy>
+          <ixz>0.000</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0.000</iyz>
+          <izz>0.001</izz>
+        </inertia> -->
+        <mass>100</mass>
+      </inertial>
 
-        <collision name="base_collision">
+      <collision name="base_collision">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/chassis.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      
+      <visual name="base_visual">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/chassis.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+
+    </link>
+
+    <link name="wheel_left">
+      <pose>0 0.275 0.075 0 0 0</pose>
+      <collision name="wheel_left_collision">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/wheel_left.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.99</mu>
+              <mu2>0.9</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="wheel_left_visual">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/wheel_left.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="wheel_right">
+      <pose>0 -0.275 0.075 0 0 0</pose>
+        <collision name="wheel_right_collision">
           <geometry>
             <mesh>
-              <uri>model://agv/meshes/chassis.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        
-        <visual name="base_visual">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/chassis.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Blue</name>
-            </script>
-          </material>
-        </visual>
-
-      </link>
-
-      <link name="wheel_left">
-        <pose>0 0.275 0.075 0 0 0</pose>
-        <collision name="wheel_left_collision">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/wheel_left.stl</uri>
+              <uri>model://agv/meshes/wheel_right.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -66,10 +100,10 @@
             </friction>
           </surface>
         </collision>
-        <visual name="wheel_left_visual">
+        <visual name="wheel_right_visual">
           <geometry>
             <mesh>
-              <uri>model://agv/meshes/wheel_left.stl</uri>
+              <uri>model://agv/meshes/wheel_right.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -80,469 +114,344 @@
             </script>
           </material>
         </visual>
-      </link>
+    </link>
 
-      <link name="wheel_right">
-        <pose>0 -0.275 0.075 0 0 0</pose>
-          <collision name="wheel_right_collision">
-            <geometry>
-              <mesh>
-                <uri>model://agv/meshes/wheel_right.stl</uri>
-                <scale>1 1 1</scale>
-              </mesh>
-            </geometry>
-            <surface>
-              <friction>
-                <ode>
-                  <mu>0.99</mu>
-                  <mu2>0.9</mu2>
-                </ode>
-              </friction>
-            </surface>
-          </collision>
-          <visual name="wheel_right_visual">
-            <geometry>
-              <mesh>
-                <uri>model://agv/meshes/wheel_right.stl</uri>
-                <scale>1 1 1</scale>
-              </mesh>
-            </geometry>
-            <material>
-              <script>
-                <uri>file://media/materials/scripts/gazebo.material</uri>
-                <name>Gazebo/Black</name>
-              </script>
-            </material>
-          </visual>
-      </link>
+    <joint type="revolute" name="wheel_left_hinge">
+      <!-- <pose>0 0.275 0.075 0 0 0</pose> -->
+      <pose>0 0 0 0 0 0</pose>
+      <child>wheel_left</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
+    </joint>
 
-      <joint type="revolute" name="wheel_left_hinge">
-        <!-- <pose>0 0.275 0.075 0 0 0</pose> -->
-        <pose>0 0 0 0 0 0</pose>
-        <child>wheel_left</child>
-        <parent>base_link</parent>
-        <axis>
-          <xyz>0 1 0</xyz>
-        </axis>
-      </joint>
+    <joint type="revolute" name="wheel_right_hinge">
+      <!-- <pose>0 -0.275 0.075 0 0 0</pose> -->
+      <pose>0 0 0 0 0 0</pose>
+      <child>wheel_right</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
+    </joint>
 
-      <joint type="revolute" name="wheel_right_hinge">
-        <!-- <pose>0 -0.275 0.075 0 0 0</pose> -->
-        <pose>0 0 0 0 0 0</pose>
-        <child>wheel_right</child>
-        <parent>base_link</parent>
-        <axis>
-          <xyz>0 1 0</xyz>
-        </axis>
-      </joint>
+    <plugin name="wheel_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <!-- Plugin update rate in Hz -->
+      <updateRate>30</updateRate>
+      <!-- Name of left joint, defaults to `left_joint` -->
+      <leftJoint>wheel_left_hinge</leftJoint>
+      <!-- Name of right joint, defaults to `right_joint` -->
+      <rightJoint>wheel_right_hinge</rightJoint>
+      <!-- The distance from the center of one wheel to the other, in meters, defaults to 0.34 m -->
+      <wheelSeparation>0.55</wheelSeparation>
+      <!-- Diameter of the wheels, in meters, defaults to 0.15 m -->
+      <wheelDiameter>0.15</wheelDiameter>
+      <!-- Wheel acceleration, in rad/s^2, defaults to 0.0 rad/s^2 -->
+      <wheelAcceleration>1.0</wheelAcceleration>
+      <!-- Maximum torque which the wheels can produce, in Nm, defaults to 5 Nm -->
+      <wheelTorque>50</wheelTorque>
+      <!-- Topic to receive geometry_msgs/Twist message commands, defaults to `cmd_vel` -->
+      <commandTopic>cmd_vel</commandTopic>
+      <!-- Topic to publish nav_msgs/Odometry messages, defaults to `odom` -->
+      <odometryTopic>odom</odometryTopic>
+      <!-- Odometry frame, defaults to `odom` -->
+      <odometryFrame>odom</odometryFrame>
+      <!-- Robot frame to calculate odometry from, defaults to `base_footprint` -->
+      <!-- <robotBaseFrame>base_footprint</robotBaseFrame> -->
+      <robotBaseFrame>base_link</robotBaseFrame>
+      <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
+      <odometrySource>0</odometrySource>
+      <!-- Set to true to publish transforms for the wheel links, defaults to false -->
+      <publishWheelTF>true</publishWheelTF>
+      <!-- Set to true to publish transforms for the odometry, defaults to true -->
+      <publishOdom>true</publishOdom>
+      <!-- Set to true to publish sensor_msgs/JointState on /joint_states for the wheel joints, defaults to false -->
+      <publishWheelJointState>true</publishWheelJointState>
+      <!-- Set to true to swap right and left wheels, defaults to true -->
+      <legacyMode>false</legacyMode>
 
-      <plugin name="wheel_drive_controller" filename="libgazebo_ros_diff_drive.so">
+    </plugin>
 
+    <!-- Lidar sick_tim551.stl-->
+    <link name="sick_tim551">
+      <pose>0.29 0 0.285 0 0 0</pose>
 
-        <!-- Plugin update rate in Hz -->
-        <updateRate>30</updateRate>
-        <!-- Name of left joint, defaults to `left_joint` -->
-        <leftJoint>wheel_left_hinge</leftJoint>
-        <!-- Name of right joint, defaults to `right_joint` -->
-        <rightJoint>wheel_right_hinge</rightJoint>
-        <!-- The distance from the center of one wheel to the other, in meters, defaults to 0.34 m -->
-        <wheelSeparation>0.55</wheelSeparation>
-        <!-- Diameter of the wheels, in meters, defaults to 0.15 m -->
-        <wheelDiameter>0.15</wheelDiameter>
-        <!-- Wheel acceleration, in rad/s^2, defaults to 0.0 rad/s^2 -->
-        <wheelAcceleration>1.0</wheelAcceleration>
-        <!-- Maximum torque which the wheels can produce, in Nm, defaults to 5 Nm -->
-        <wheelTorque>50</wheelTorque>
-        <!-- Topic to receive geometry_msgs/Twist message commands, defaults to `cmd_vel` -->
-        <commandTopic>cmd_vel</commandTopic>
-        <!-- Topic to publish nav_msgs/Odometry messages, defaults to `odom` -->
-        <odometryTopic>odom</odometryTopic>
-        <!-- Odometry frame, defaults to `odom` -->
-        <odometryFrame>odom</odometryFrame>
-        <!-- Robot frame to calculate odometry from, defaults to `base_footprint` -->
-        <robotBaseFrame>base_footprint</robotBaseFrame>
-        <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
-        <odometrySource>0</odometrySource>
-        <!-- Set to true to publish transforms for the wheel links, defaults to false -->
-        <publishWheelTF>true</publishWheelTF>
-        <!-- Set to true to publish transforms for the odometry, defaults to true -->
-        <publishOdom>true</publishOdom>
-        <!-- Set to true to publish sensor_msgs/JointState on /joint_states for the wheel joints, defaults to false -->
-        <publishWheelJointState>true</publishWheelJointState>
-        <!-- Set to true to swap right and left wheels, defaults to true -->
-        <legacyMode>false</legacyMode>
+      <visual name="sick_tim551_visual">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/sick_tim551.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Gray</name>
+          </script>
+        </material>
+      </visual>
 
-      </plugin>
+      <sensor type="ray" name="sick_tim551">
+        <!-- <pose>0.29 0 0.27 0 0 0</pose> -->
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>true</visualize>
 
-      <!-- Lidar sick_tim551.stl-->
-      <link name="sick_tim551">
-        <pose>0.29 0 0.285 0 0 0</pose>
-        <collision name="sick_tim551_collision">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/sick_tim551.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-        </collision>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1</resolution>
+              <!-- -90 ~ 90 -->
+              <min_angle>-1.5707963</min_angle>
+              <max_angle>1.5707963</max_angle>
 
-        <visual name="sick_tim551_visual">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/sick_tim551.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Gray</name>
-            </script>
-          </material>
-        </visual>
+              <!-- -60 ~ 60 -->
+              <!-- <min_angle>-1.0472</min_angle>
+              <max_angle>1.0472</max_angle> -->
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.1</min>
+            <max>10</max>
+            <resolution>0.001</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <!-- Noise parameters based on published spec for Hokuyo laser
+                  achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+                  stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+                  reading. -->
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
 
-        <sensor type="ray" name="sick_tim551">
-          <!-- <pose>0.29 0 0.27 0 0 0</pose> -->
-          <always_on>1</always_on>
-          <update_rate>30</update_rate>
-          <visualize>true</visualize>
+        <plugin name="laser" filename="libgazebo_ros_laser.so">
+          <!-- <gaussianNoise>0.9</gaussianNoise> -->
+          <topicName>scan</topicName>
+          <frameName>laser</frameName>
+        </plugin>
+      </sensor>
+    </link>
 
-          <ray>
-            <scan>
-              <horizontal>
-                <samples>360</samples>
-                <resolution>1</resolution>
-                <!-- -90 ~ 90 -->
-                <min_angle>-1.5707963</min_angle>
-                <max_angle>1.5707963</max_angle>
+    <joint type="fixed" name="laser_joint">
+      <child>sick_tim551</child>
+      <parent>base_link</parent>
+    </joint>
 
-                <!-- -60 ~ 60 -->
-                <!-- <min_angle>-1.0472</min_angle>
-                <max_angle>1.0472</max_angle> -->
-              </horizontal>
-            </scan>
-            <range>
-              <min>0.1</min>
-              <max>10</max>
-              <resolution>0.001</resolution>
-            </range>
-            <noise>
-              <type>gaussian</type>
-              <!-- Noise parameters based on published spec for Hokuyo laser
-                   achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
-                   stddev of 0.01m will put 99.7% of samples within 0.03m of the true
-                   reading. -->
-              <mean>0.0</mean>
-              <stddev>0.01</stddev>
-            </noise>
-          </ray>
+    <!-- Camera -->
+    <link name="camera_front">
+      <pose>0.33 0 0.13 0 0 0</pose>
 
-          <plugin name="laser" filename="libgazebo_ros_laser.so">
-            <!-- <gaussianNoise>0.9</gaussianNoise> -->
-            <topicName>scan</topicName>
-            <frameName>laser</frameName>
-          </plugin>
-        </sensor>
-      </link>
+      <visual name="camera_front_visual">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/camera_front.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
 
-      <joint type="fixed" name="laser_joint">
-        <child>sick_tim551</child>
-        <parent>base_link</parent>
-      </joint>
+      <sensor type="camera" name="camera_front">
+        <update_rate>30.0</update_rate>
+        <camera name="camera_front">
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>800</width>
+            <height>600</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <!-- Noise is sampled independently per pixel on each frame.
+                That pixel's noise value is added to each of its color
+                channels, which at that point lie in the range [0,1]. -->
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
 
-      <!-- Camera -->
-      <link name="camera_front">
-        <pose>0.33 0 0.13 0 0 0</pose>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>camera_front</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>camera_front</frameName>
+          <hackBaseline>0.07</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+      </sensor>
+    </link>
 
-        <collision name="camera_front_collision">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/camera_front.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-        </collision>
+    <joint type="fixed" name="front_cam_joint">
+      <child>camera_front</child>
+      <parent>base_link</parent>
+    </joint>
 
-        <visual name="camera_front_visual">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/camera_front.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
-            </script>
-          </material>
-        </visual>
+    <link name="camera_back">
+      <pose>-0.33 0 0.13 0 0 3.1416</pose>
+      <visual name="camera_back_visual">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/camera_back.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
 
-        <sensor type="camera" name="camera_front">
-          <update_rate>30.0</update_rate>
-          <camera name="camera_front">
-            <horizontal_fov>1.3962634</horizontal_fov>
-            <image>
-              <width>800</width>
-              <height>600</height>
-              <format>R8G8B8</format>
-            </image>
-            <clip>
-              <near>0.02</near>
-              <far>300</far>
-            </clip>
-            <noise>
-              <type>gaussian</type>
-              <!-- Noise is sampled independently per pixel on each frame.
-                  That pixel's noise value is added to each of its color
-                  channels, which at that point lie in the range [0,1]. -->
-              <mean>0.0</mean>
-              <stddev>0.007</stddev>
-            </noise>
-          </camera>
-
-          <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-            <alwaysOn>true</alwaysOn>
-            <updateRate>0.0</updateRate>
-            <cameraName>camera_front</cameraName>
-            <imageTopicName>image_raw</imageTopicName>
-            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-            <frameName>camera_front</frameName>
-            <hackBaseline>0.07</hackBaseline>
-            <distortionK1>0.0</distortionK1>
-            <distortionK2>0.0</distortionK2>
-            <distortionK3>0.0</distortionK3>
-            <distortionT1>0.0</distortionT1>
-            <distortionT2>0.0</distortionT2>
-          </plugin>
-        </sensor>
-      </link>
-
-      <joint type="fixed" name="front_cam_joint">
-        <child>camera_front</child>
-        <parent>base_link</parent>
-      </joint>
-
-      <!-- <link name="camera_back">
-        <pose>-0.33 0 0.13 0 0 3.1416</pose>
-        <collision name="camera_back_collision">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/camera_back.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-        </collision>
-
-        <visual name="camera_back_visual">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/camera_back.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
-            </script>
-          </material>
-        </visual>
-
-        <sensor type="camera" name="camera_back">
-          <update_rate>30.0</update_rate>
-          <camera name="camera_back">
-            <horizontal_fov>1.3962634</horizontal_fov>
-            <image>
-              <width>800</width>
-              <height>600</height>
-              <format>R8G8B8</format>
-            </image>
-            <clip>
-              <near>0.02</near>
-              <far>300</far>
-            </clip>
-            <noise>
-              <type>gaussian</type>
-              <mean>0.0</mean>
-              <stddev>0.007</stddev>
-            </noise>
-          </camera>
-          <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-            <alwaysOn>true</alwaysOn>
-            <updateRate>0.0</updateRate>
-            <cameraName>camera_back</cameraName>
-            <imageTopicName>image_raw</imageTopicName>
-            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-            <frameName>camera_back</frameName>
-            <hackBaseline>0.07</hackBaseline>
-            <distortionK1>0.0</distortionK1>
-            <distortionK2>0.0</distortionK2>
-            <distortionK3>0.0</distortionK3>
-            <distortionT1>0.0</distortionT1>
-            <distortionT2>0.0</distortionT2>
-          </plugin>
-        </sensor>
-      </link> 
-      <joint type="fixed" name="camera_back_joint">
-        <child>camera_back</child>
-        <parent>base_link</parent>
-      </joint>
-      -->
-      <link name="usb_cam">
-        <pose>-0.33 0 0.13 0 0 3.1416</pose>
-        <collision name="usb_cam_collision">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/camera_back.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-        </collision>
-
-        <visual name="usb_cam_visual">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/camera_back.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
-            </script>
-          </material>
-        </visual>
-
-        <sensor type="camera" name="usb_cam">
-          <update_rate>60.0</update_rate>
-          <camera name="usb_cam">
-            <horizontal_fov>1.3962634</horizontal_fov>
-            <image>
-              <width>640</width>
-              <height>480</height>
-              <format>R8G8B8</format>
-            </image>
-            <clip>
-              <near>0.02</near>
-              <far>300</far>
-            </clip>
-            <noise>
-              <type>gaussian</type>
-              <!-- Noise is sampled independently per pixel on each frame.
-                  That pixel's noise value is added to each of its color
-                  channels, which at that point lie in the range [0,1]. -->
-              <mean>0.0</mean>
-              <stddev>0.007</stddev>
-            </noise>
-          </camera>
-          <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-            <alwaysOn>true</alwaysOn>
-            <updateRate>0.0</updateRate>
-            <cameraName>usb_cam</cameraName>
-            <imageTopicName>image_raw</imageTopicName>
-            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-            <frameName>usb_cam</frameName>
-            <hackBaseline>0.07</hackBaseline>
-            <distortionK1>0.0</distortionK1>
-            <distortionK2>0.0</distortionK2>
-            <distortionK3>0.0</distortionK3>
-            <distortionT1>0.0</distortionT1>
-            <distortionT2>0.0</distortionT2>
-          </plugin>
-        </sensor>
-      </link>
-      <joint type="fixed" name="usb_cam_joint">
-        <child>usb_cam</child>
-        <parent>base_link</parent>
-      </joint>
-
-      <link name="caster_front">
-        <pose>0.3 0 0.02 0 0 0 </pose>
-        <collision name="caster_front_collision">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/caster_front.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.1</mu>
-                <mu2>0.1</mu2>
-              </ode>
-            </friction>
-          </surface>
-        </collision>
-
-        <visual name="caster_front_visual">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/caster_front.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Gray</name>
-            </script>
-          </material>
-        </visual>
-      </link>
-
-      <link name="caster_back">
-        <pose>-0.3 0 0.02 0 0 0 </pose>
-        <collision name="caster_back_collision">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/caster_back.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.1</mu>
-                <mu2>0.1</mu2>
-              </ode>
-            </friction>
-          </surface>
-        </collision>
-
-        <visual name="caster_back_visual">
-          <geometry>
-            <mesh>
-              <uri>model://agv/meshes/caster_back.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Gray</name>
-            </script>
-          </material>
-        </visual>
-      </link>
-
-      <joint type="fixed" name="caster_front_joint">
-        <parent>base_link</parent>
-        <child>caster_front</child>
-      </joint>
-
-      <joint type="fixed" name="caster_back_joint">
-        <parent>base_link</parent>
-        <child>caster_back</child>
-      </joint>
-
-      <joint type="fixed" name="base_joint">
-        <parent>base_link</parent>
-        <child>base_footprint</child>
-      </joint>
-
+      <sensor type="camera" name="camera_back">
+        <update_rate>30.0</update_rate>
+        <camera name="camera_back">
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>800</width>
+            <height>600</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>camera_back</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>camera_back</frameName>
+          <hackBaseline>0.07</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+      </sensor>
+    </link> 
+    <joint type="fixed" name="camera_back_joint">
+      <child>camera_back</child>
+      <parent>base_link</parent>
+    </joint>
     
+
+    <joint type="fixed" name="usb_cam_joint">
+      <child>usb_cam</child>
+      <parent>base_link</parent>
+    </joint>
+
+    <link name="caster_front">
+      <pose>0.3 0 0.02 0 0 0 </pose>
+      <collision name="caster_front_collision">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/caster_front.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.1</mu>
+              <mu2>0.1</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+
+      <visual name="caster_front_visual">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/caster_front.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Gray</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="caster_back">
+      <pose>-0.3 0 0.02 0 0 0 </pose>
+      <collision name="caster_back_collision">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/caster_back.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.1</mu>
+              <mu2>0.1</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+
+      <visual name="caster_back_visual">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/caster_back.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Gray</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <joint type="fixed" name="caster_front_joint">
+      <parent>base_link</parent>
+      <child>caster_front</child>
+    </joint>
+
+    <joint type="fixed" name="caster_back_joint">
+      <parent>base_link</parent>
+      <child>caster_back</child>
+    </joint>
+
+    <joint type="fixed" name="base_joint">
+      <parent>base_link</parent>
+      <child>base_footprint</child>
+    </joint>
+
   </model>
 </sdf>
