@@ -5,7 +5,8 @@ int main(int argc, char** argv) {
   
   ros::init(argc, argv, "apriltag_docking");
   ros::NodeHandle node;
-  ApriltagDockingPath AdockingPath(node);
+  float offset=0.4;
+  ApriltagDockingPath AdockingPath(node, offset);
 
   ros::spin();
 

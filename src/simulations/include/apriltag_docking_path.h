@@ -17,8 +17,10 @@ class ApriltagDockingPath {
     tf::StampedTransform  tf_tag_pose;
     tf::TransformListener tf_car_pose_listenser;
     tf::TransformListener tf_tag_pose_listenser;
-    ApriltagDockingPath(ros::NodeHandle node) {
+    float _offset=0.4;
+    ApriltagDockingPath(ros::NodeHandle node, float offset) {
       ros_node = node;
+      _offset = offset;
       tag_detections = node.subscribe("/tag_detections", 60, &ApriltagDockingPath::create_bezier, this);
     };
 
@@ -28,7 +30,7 @@ class ApriltagDockingPath {
       }
 
       try{
-        tf_car_pose_listenser.lookupTransform("/map", "/agv_car/base_footprint", ros::Time(0), tf_car_pose);
+        tf_car_pose_listenser.lookupTransform("/map", "/agv_car/base_link", ros::Time(0), tf_car_pose);
         tf_tag_pose_listenser.lookupTransform("/map", "A", ros::Time(0),  tf_tag_pose);
       }
       catch (tf::TransformException ex){
@@ -38,7 +40,7 @@ class ApriltagDockingPath {
       
       nav_msgs::Path docking_path;
       tf::Vector3 z_axis(0,0,1);
-      tf::Vector3 bezier_vector0(0.4, 0, 0), bezier_vector1(0.4+0.3, 0, 0), bezier_vector2(-0.3, 0, 0);
+      tf::Vector3 bezier_vector0(_offset, 0, 0), bezier_vector1(_offset+0.3, 0, 0), bezier_vector2(-0.3, 0, 0);
       tf::Point bezier_point0, bezier_point1, bezier_point2, bezier_point3;
       tf::Point tag_pose = tf_tag_pose.getOrigin();
       bezier_point3= tf_car_pose.getOrigin();
@@ -50,7 +52,7 @@ class ApriltagDockingPath {
         return;
       }
       if (dist < 0.15) {
-        bezier_vector1.setValue(0.4+0.15, 0, 0);
+        bezier_vector1.setValue(_offset+0.15, 0, 0);
         bezier_vector2.setValue(-0.15, 0, 0);
       }
 
@@ -99,11 +101,11 @@ class ApriltagDockingPath {
         geometry_msgs::PoseStamped ros_pose;
         ros_pose.pose.position.x = bx;
         ros_pose.pose.position.y = by;
-        ros_pose.header.frame_id = "path";
+        ros_pose.header.frame_id = "map";
         docking_path.poses.push_back(ros_pose);
       }
 
-      docking_path.header.frame_id = "path";
+      docking_path.header.frame_id = "map";
 
       std::cout<<"path poses size:"<<docking_path.poses.size()<<std::endl;
       pub_docking_path = ros_node.advertise<nav_msgs::Path>("bezier", 1);
