@@ -1,0 +1,33 @@
+<launch>
+  <!-- Arguments -->
+  
+  <arg name="map_file" default="$(find simulations)/maps/maze.yaml"/>
+  <arg name="open_rviz" default="true"/>
+  <arg name="move_forward_only" default="true"/>
+  
+  <node pkg="path_tracking" type="path_tracking" name="path_tracking" output="log">
+  </node>
+
+  <node pkg="work_manager" type="work_manager" name="work_manager">
+  </node>
+
+  <!-- AMCL -->
+  <include file="$(find simulations)/launch/agv-amcl.launch" >
+    <arg name="scan_topic"     value="/scan"/>
+    <arg name="odom_frame_id"  value="/agv_car/odom"/>
+    <arg name="base_frame_id"  value="/agv_car/base_link"/>
+  </include>
+
+  <!-- move_base -->
+  <!-- <include file="$(find simulations)/launch/agv-move_base.launch">
+    <arg name="move_forward_only" value="$(arg move_forward_only)"/>
+    <arg name="odom_topic"  value="/agv_car/odom"/>
+    <arg name="cmd_vel_topic" value="/cmd_vel" />
+  </include> -->
+
+  <!-- rviz -->
+  <!-- <group if="$(arg open_rviz)"> 
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find turtlebot3_navigation)/rviz/turtlebot3_navigation.rviz"/>
+  </group> -->
+</launch>
