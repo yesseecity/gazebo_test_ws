@@ -33,7 +33,7 @@
     
     <include>
       <uri>model://agv</uri>
-      <!-- <pose>1.5 9.8 0.001 0 0 0</pose>
+      <pose>1.5 9.8 0.001 0 0 0</pose>
     </include>
 
     <include>
