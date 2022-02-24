@@ -5,11 +5,11 @@
   <arg name="open_rviz" default="true"/>
   <arg name="move_forward_only" default="true"/>
   
-  <node pkg="path_tracking" type="path_tracking" name="path_tracking" output="log">
+<!--   <node pkg="path_tracking" type="path_tracking" name="path_tracking" output="log">
   </node>
 
   <node pkg="work_manager" type="work_manager" name="work_manager">
-  </node>
+  </node> -->
 
   <!-- AMCL -->
   <include file="$(find simulations)/launch/agv-amcl.launch" >
@@ -19,11 +19,11 @@
   </include>
 
   <!-- move_base -->
-  <!-- <include file="$(find simulations)/launch/agv-move_base.launch">
+  <include file="$(find simulations)/launch/agv-move_base.launch">
     <arg name="move_forward_only" value="$(arg move_forward_only)"/>
     <arg name="odom_topic"  value="/agv_car/odom"/>
     <arg name="cmd_vel_topic" value="/cmd_vel" />
-  </include> -->
+  </include>
 
   <!-- rviz -->
   <!-- <group if="$(arg open_rviz)"> 
