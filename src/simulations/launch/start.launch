@@ -12,7 +12,7 @@
     <arg name="world_name" value="$(arg world)"/> 
     <arg name="recording" value="false"/>
     <arg name="debug" value="false"/>
-    <arg name="gui" value="$(arg gui)"/>
+    <!-- <arg name="gui" value="$(arg gui)"/> -->
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="physics" value="ode"/>
@@ -22,18 +22,27 @@
   <!--      已先加在 test.world裡面 -->
   <!-- <node pkg="gazebo_ros" type="spawn_model" name="spawn_agv"  args="-file $(find simulations)/models/agv/model.sdf -sdf -x 0 -y 0 -z 0 -model agv" /> -->
   
+  <!-- <node pkg="tf" type="static_transform_publisher" name="~~~" 
+    args="x y z * * * parent_frame child_frame 100"/> -->
+  <node pkg="tf" type="static_transform_publisher" name="map_to_path" 
+    args="0 0 0 0 0 0  map path 100"/>
   <node pkg="tf" type="static_transform_publisher" name="map_to_odom" 
     args="0 0 0 0 0 0  map /agv_car/odom 100"/>
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser_broadcaster" 
     args="0.29 0 0.285 0 0 0 /agv_car/base_link laser 100"/>
+  <node pkg="tf" type="static_transform_publisher" name="imu_to_base_link" 
+    args="0 0 1 0 0 0  /agv_car/base_link imu_link 100"/>
 
   <!-- <include file="$(find simulations)/launch/apriltag.launch" ></include> -->
   <include file="$(find simulations)/launch/ds4.launch" ></include>
 
   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find simulations)/rviz/config.rviz" />
 
+  <arg name="img_topic" default="/camera_front/image_raw" />
+  <!-- <arg name="img_topic" default="/camera_back/image_raw" />
+  <arg name="img_topic" default="/tag_detections_image" /> -->
   <!-- <node name="front_cam_view" pkg="image_view" type="image_view" respawn="false" output="screen">
-    <remap from="image" to="/camera_front/image_raw" />
+    <remap from="image" to="$(arg img_topic)" />
   </node> -->
 
 
@@ -42,8 +51,9 @@
   <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
 
   <!-- NAV -->
-  <include file="$(find simulations)/launch/agv-navigiation.launch" >
-  </include>
+  <!-- <include file="$(find simulations)/launch/agv-navigiation.launch" >
+  </include> -->
 
+  <!-- <node pkg="simulations" name="electrode-contact" type="electrode-contact.py" /> -->
 
 </launch>

@@ -1,8 +1,13 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <model name="charge_station">
-    <static>true</static>
+    <static>false</static>
+
     <link name="charge_station">
+      <inertial>
+        <pose>-0.05 0 0.01 0 0 0</pose>
+        <mass>20.0</mass>
+      </inertial>
       <pose>0 0 0 0 0 0</pose>
       <collision name="charge_station_collision">
         <geometry>
@@ -30,20 +35,20 @@
       </visual>
     </link>
 
-    <link name="electrode-left">
+    <link name="electrode_postive">
       <pose>0 0 0 0 0 0</pose>
       <visual name="apriltag_visual">
         <geometry>
           <mesh>
-            <uri>model://charge_station/meshes/electrode-left.dae</uri>
+            <uri>model://charge_station/meshes/electrode-postive.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
       </visual>
-      <collision name="electrode_left_collision">
+      <collision name="electrode_postive_collision">
         <geometry>
           <mesh>
-            <uri>model://charge_station/meshes/electrode-left.dae</uri>
+            <uri>model://charge_station/meshes/electrode-postive.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -56,36 +61,22 @@
           </friction>
         </surface>
       </collision>
-      <sensor type="contact" name="bumper">
-        <always_on>true</always_on>
-        <update_rate>1000.0</update_rate>
-        <visualize>true</visualize>
-        <contact>
-          <collision>electrode_left_collision</collision>
-        </contact>
-        <plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">//gazebo自带的bumper插件调用样式
-          <alwaysOn>true</alwaysOn>
-          <updateRate>60</updateRate>
-          <bumperTopicName>charge_station/bumper_left</bumperTopicName>
-          <frameName>map</frameName>
-        </plugin>
-      </sensor>
     </link>
 
-    <link name="electrode-right">
+    <link name="electrode_negative">
       <pose>0 0 0 0 0 0</pose>
       <visual name="apriltag_visual">
         <geometry>
           <mesh>
-            <uri>model://charge_station/meshes/electrode-right.dae</uri>
+            <uri>model://charge_station/meshes/electrode-negative.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
       </visual>
-      <collision name="electrode_right_collision">
+      <collision name="electrode_negative_collision">
         <geometry>
           <mesh>
-            <uri>model://charge_station/meshes/electrode-right.dae</uri>
+            <uri>model://charge_station/meshes/electrode-negative.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -98,20 +89,6 @@
           </friction>
         </surface>
       </collision>
-      <sensor type="contact" name="bumper">
-        <always_on>true</always_on>
-        <update_rate>1000.0</update_rate>
-        <visualize>true</visualize>
-        <contact>
-          <collision>electrode_right_collision</collision>
-        </contact>
-        <plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">//gazebo自带的bumper插件调用样式
-          <alwaysOn>true</alwaysOn>
-          <updateRate>60</updateRate>
-          <bumperTopicName>charge_station/bumper_right</bumperTopicName>
-          <frameName>map</frameName>
-        </plugin>
-      </sensor>
     </link>
 
     <link name="Apriltag-A">
@@ -137,6 +114,23 @@
         </geometry>
       </visual>
     </link>
+
+    <joint type="fixed" name="electrode_postive_joint">
+      <child>electrode_postive</child>
+      <parent>charge_station</parent>
+    </joint>
+    <joint type="fixed" name="electrode_negative_joint">
+      <child>electrode_negative</child>
+      <parent>charge_station</parent>
+    </joint>
+    <joint type="fixed" name="Apriltag_A_joint">
+      <child>Apriltag-A</child>
+      <parent>charge_station</parent>
+    </joint>
+    <joint type="fixed" name="Apriltag_B_joint">
+      <child>Apriltag-B</child>
+      <parent>charge_station</parent>
+    </joint>
 
     
   </model>

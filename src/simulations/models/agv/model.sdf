@@ -8,7 +8,7 @@
     </link>
 
     <link name="base_link">
-      <pose>0 0 0.2 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0.15 0 0 0</pose>
         <!-- <inertia>
@@ -21,20 +21,18 @@
         </inertia> -->
         <mass>100</mass>
       </inertial>
-
       <collision name="base_collision">
         <geometry>
           <mesh>
-            <uri>model://agv/meshes/chassis.stl</uri>
+            <uri>model://agv/meshes/chassis_v2.stl</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
       </collision>
-      
       <visual name="base_visual">
         <geometry>
           <mesh>
-            <uri>model://agv/meshes/chassis.stl</uri>
+            <uri>model://agv/meshes/chassis_v2.stl</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -45,7 +43,23 @@
           </script>
         </material>
       </visual>
-
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>60</update_rate>
+        <visualize>true</visualize>
+        <topic>imu_sensor</topic>
+        <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+          <topicName>imu</topicName>
+          <bodyName>imu_link</bodyName>
+          <updateRateHZ>10.0</updateRateHZ>
+          <gaussianNoise>0.0</gaussianNoise>
+          <xyzOffset>0 0 0</xyzOffset>
+          <rpyOffset>0 0 0</rpyOffset>
+          <frameName>imu_link</frameName>
+          <initialOrientationAsReference>false</initialOrientationAsReference>
+        </plugin>
+        <pose>0 0 0 0 0 0</pose>
+      </sensor>
     </link>
 
     <link name="wheel_left">
@@ -299,7 +313,6 @@
         </plugin>
       </sensor>
     </link>
-
     <joint type="fixed" name="front_cam_joint">
       <child>camera_front</child>
       <parent>base_link</parent>
@@ -361,12 +374,6 @@
       <child>camera_back</child>
       <parent>base_link</parent>
     </joint>
-    
-
-    <joint type="fixed" name="usb_cam_joint">
-      <child>usb_cam</child>
-      <parent>base_link</parent>
-    </joint>
 
     <link name="caster_front">
       <pose>0.3 0 0.02 0 0 0 </pose>
@@ -402,6 +409,10 @@
         </material>
       </visual>
     </link>
+    <joint type="fixed" name="caster_front_joint">
+      <parent>base_link</parent>
+      <child>caster_front</child>
+    </joint>
 
     <link name="caster_back">
       <pose>-0.3 0 0.02 0 0 0 </pose>
@@ -437,15 +448,101 @@
         </material>
       </visual>
     </link>
-
-    <joint type="fixed" name="caster_front_joint">
-      <parent>base_link</parent>
-      <child>caster_front</child>
-    </joint>
-
     <joint type="fixed" name="caster_back_joint">
       <parent>base_link</parent>
       <child>caster_back</child>
+    </joint>
+
+    <link name="electrode_postive">
+      <pose>0 0 0 0 0 0 </pose>
+      <collision name="electrode_postive_collision">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/electrode-postive.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.1</mu>
+              <mu2>0.1</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="electrode_postive_visual">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/electrode-postive.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <sensor type="contact" name="bumper">
+        <always_on>true</always_on>
+        <update_rate>10.0</update_rate>
+        <visualize>true</visualize>
+        <contact>
+          <collision>electrode_postive_collision</collision>
+        </contact>
+        <plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">//gazebo自带的bumper插件调用样式
+          <alwaysOn>true</alwaysOn>
+          <updateRate>10</updateRate>
+          <bumperTopicName>charge_station/bumper_left</bumperTopicName>
+          <frameName>map</frameName>
+        </plugin>
+      </sensor>
+    </link>
+    <joint type="fixed" name="electrode_postive_joint">
+      <child>electrode_postive</child>
+      <parent>base_link</parent>
+    </joint>
+
+    <link name="electrode_negative">
+      <pose>0 0 0 0 0 0 </pose>
+      <collision name="electrode_negative_collision">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/electrode-negative.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.1</mu>
+              <mu2>0.1</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="electrode_negative_visual">
+        <geometry>
+          <mesh>
+            <uri>model://agv/meshes/electrode-negative.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <sensor type="contact" name="bumper">
+        <always_on>true</always_on>
+        <update_rate>10.0</update_rate>
+        <visualize>true</visualize>
+        <contact>
+          <collision>electrode_negative_collision</collision>
+        </contact>
+        <plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">//gazebo自带的bumper插件调用样式
+          <alwaysOn>true</alwaysOn>
+          <updateRate>10</updateRate>
+          <bumperTopicName>charge_station/bumper_right</bumperTopicName>
+          <frameName>map</frameName>
+        </plugin>
+      </sensor>
+    </link>
+    <joint type="fixed" name="electrode_negative_joint">
+      <child>electrode_negative</child>
+      <parent>base_link</parent>
     </joint>
 
     <joint type="fixed" name="base_joint">
