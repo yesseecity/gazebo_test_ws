@@ -21,6 +21,7 @@ class ApriltagDockingPath {
     ApriltagDockingPath(ros::NodeHandle node, float offset) {
       ros_node = node;
       _offset = offset;
+      tf_car_pose_listenser.waitForTransform("map", "agv_car/base_link", ros::Time(0), ros::Duration(3.0));
       tag_detections = node.subscribe("/tag_detections", 60, &ApriltagDockingPath::create_bezier, this);
     };
 
@@ -30,8 +31,9 @@ class ApriltagDockingPath {
       }
 
       try{
-        tf_car_pose_listenser.lookupTransform("/map", "/agv_car/base_link", ros::Time(0), tf_car_pose);
-        tf_tag_pose_listenser.lookupTransform("/map", "A", ros::Time(0),  tf_tag_pose);
+        tf_tag_pose_listenser.waitForTransform("map", "A", ros::Time(0), ros::Duration(3.0));
+        tf_car_pose_listenser.lookupTransform("map", "agv_car/base_link", ros::Time(0), tf_car_pose);
+        tf_tag_pose_listenser.lookupTransform("map", "A", ros::Time(0),  tf_tag_pose);
       }
       catch (tf::TransformException ex){
         ROS_ERROR("%s", ex.what());
@@ -40,7 +42,9 @@ class ApriltagDockingPath {
       
       nav_msgs::Path docking_path;
       tf::Vector3 z_axis(0,0,1);
-      tf::Vector3 bezier_vector0(_offset, 0, 0), bezier_vector1(_offset+0.3, 0, 0), bezier_vector2(-0.3, 0, 0);
+      tf::Vector3 bezier_vector0(_offset, 0, 0);
+      tf::Vector3 bezier_vector1(_offset+0.3, 0, 0);
+      tf::Vector3 bezier_vector2(-0.2, 0, 0);
       tf::Point bezier_point0, bezier_point1, bezier_point2, bezier_point3;
       tf::Point tag_pose = tf_tag_pose.getOrigin();
       bezier_point3= tf_car_pose.getOrigin();
@@ -57,36 +61,30 @@ class ApriltagDockingPath {
       }
 
       double car_roll, car_pitch, car_yaw;
-      double tag_roll, tag_pitch, tag_yaw;
+      // double tag_roll, tag_pitch, tag_yaw;
       
       tf::Matrix3x3 car_matrix( tf_car_pose.getRotation());
       car_matrix.getRPY(car_roll, car_pitch, car_yaw);
       // tf::Matrix3x3 tag_matrix( tf_tag_pose.getRotation());
       // tag_matrix.getRPY(tag_roll, tag_pitch, tag_yaw);
       
-      std::cout<<"dist: "<<dist<<std::endl;
-      printf("position: \t(     x,      y,      z) ");
-      printf("rotate: (tag_roll, tag_pitch, tag_yaw) \n");
-      printf("point0    \t(%6.3f, %6.3f, %6.3f) ", bezier_point0.x(), bezier_point0.y(), bezier_point0.z());
-      printf("        (%8.3f, %8.3f, %8.5f) \n", tag_roll, tag_pitch, tag_yaw-M_PI_2);
-      // printf("position: \t(     x,      y,      z) ");
-      // printf("rotate: (car_roll, car_pitch, car_yaw) \n");
-      // printf("point3    \t(%6.3f, %6.3f, %6.3f) ", bezier_point3.x(), bezier_point3.y(), bezier_point3.z());
-      // printf("        (%8.3f, %8.3f, %8.3f) \n", car_roll, car_pitch, car_yaw);
 
-      printf("====================================================\n");
-
+      // bezier path的原始方向為 tag 到 車體
       bezier_point0 =  tag_pose + bezier_vector0.rotate(z_axis, 0); //tag_yaw-M_PI_2
       bezier_point1 =  tag_pose + bezier_vector1.rotate(z_axis, 0); //tag_yaw-M_PI_2
       bezier_vector2 = bezier_vector2.rotate(z_axis, car_yaw);
       bezier_point2 = bezier_point3 + bezier_vector2;
 
+      // bezier path 在進行取中間點位時 將方向翻轉
       double xa, ya, xb, yb, xc, yc, bx, by, xm, ym, xn, yn;
-      for( double i = 0 ; i < 1 ; i += 0.05 ) {
+      for( double i = 1 ; i >= 0 ; i -= 0.05 ) {
+        // bezier 是由四個點連成的三條線所算出的
         xa = getPt( bezier_point0.x() , bezier_point1.x() , i );
         ya = getPt( bezier_point0.y() , bezier_point1.x() , i );
+        
         xb = getPt( bezier_point1.x() , bezier_point2.x() , i );
         yb = getPt( bezier_point1.y() , bezier_point2.y() , i );
+        
         xc = getPt( bezier_point2.x() , bezier_point3.x() , i );
         yc = getPt( bezier_point2.y() , bezier_point3.y() , i );
 
@@ -108,11 +106,16 @@ class ApriltagDockingPath {
       docking_path.header.frame_id = "map";
 
       std::cout<<"path poses size:"<<docking_path.poses.size()<<std::endl;
+      
+      std::cout<<"publish bezier path"<<std::endl;
       pub_docking_path = ros_node.advertise<nav_msgs::Path>("bezier", 1);
       pub_docking_path.publish(docking_path);
+      
+      
+      // ros::ServiceClient client = n.serviceClient<beginner_tutorials::AddTwoInts>("add_two_ints");
       ros::spinOnce();
 
-      // tag_detections.shutdown();
+      tag_detections.shutdown();
     };
     double getPt( double n1 , double n2 , double perc ){
       double diff = n2 - n1;
