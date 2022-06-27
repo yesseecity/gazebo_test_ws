@@ -1,9 +1,9 @@
 standalone_tags:
   [
-    {id: 0, size: 0.075, name: "A"},
-    {id: 1, size: 0.075, name: "B"},
-    {id: 2, size: 0.075, name: "C"},
-    {id: 3, size: 0.075, name: "D"},
-    {id: 4, size: 0.075, name: "E"},
-    {id: 5, size: 0.075, name: "F"}
+    {id: 0, size: 0.07, name: "A"},
+    {id: 1, size: 0.07, name: "B"},
+    {id: 2, size: 0.07, name: "C"},
+    {id: 3, size: 0.07, name: "D"},
+    {id: 4, size: 0.07, name: "E"},
+    {id: 5, size: 0.07, name: "F"}
   ]

@@ -22,7 +22,7 @@ class DummyPoint {
     tf::TransformListener tf_tag_pose_listenser_a;
     tf::TransformListener tf_tag_pose_listenser_b;
     tf::Point dummy_mark_pose;
-    ros::Publisher puber_v1, puber_v2, puber_x, puber_y, puber_z;
+    ros::Publisher puber_docking_direction, puber_x, puber_y, puber_z;
   public:
     DummyPoint(ros::NodeHandle node) {
       ros_node = node;
@@ -73,7 +73,7 @@ class DummyPoint {
       mark_state.model_name = "direction";
       mark_state.pose.position.x = dummy_mark_pose.x();
       mark_state.pose.position.y = dummy_mark_pose.y();
-      mark_state.pose.position.z = dummy_mark_pose.z()+0.5;
+      mark_state.pose.position.z = dummy_mark_pose.z()+0.1;
       mark_state.pose.orientation.x = q.x();
       mark_state.pose.orientation.y = q.y();
       mark_state.pose.orientation.z = q.z();
@@ -82,31 +82,19 @@ class DummyPoint {
       mark_pose_puber.publish(mark_state);
 
 
-      // geometry_msgs::PoseStamped a_to_b_topic;
-      // a_to_b_topic.header.frame_id = "map";
-      // a_to_b_topic.pose.position.x = dummy_mark_pose.x();
-      // a_to_b_topic.pose.position.y = dummy_mark_pose.y();
-      // a_to_b_topic.pose.position.z = dummy_mark_pose.z();
-      // a_to_b_topic.pose.orientation.x = a_to_b.x();
-      // a_to_b_topic.pose.orientation.y = a_to_b.y();
-      // a_to_b_topic.pose.orientation.z = a_to_b.z();
-      // a_to_b_topic.pose.orientation.w = a_to_b.w();
-      // puber_v1 = ros_node.advertise<geometry_msgs::PoseStamped>("/pose/v1", 1);
-      // puber_v1.publish(a_to_b_topic);
-      // ROS_INFO("pub v1");
+      geometry_msgs::PoseStamped docking_direction_topic;
+      docking_direction_topic.header.frame_id = "map";
+      docking_direction_topic.pose.position.x = dummy_mark_pose.x();
+      docking_direction_topic.pose.position.y = dummy_mark_pose.y();
+      docking_direction_topic.pose.position.z = dummy_mark_pose.z();
+      docking_direction_topic.pose.orientation.x = q.x();
+      docking_direction_topic.pose.orientation.y = q.y();
+      docking_direction_topic.pose.orientation.z = q.z();
+      docking_direction_topic.pose.orientation.w = q.w();
+      puber_docking_direction = ros_node.advertise<geometry_msgs::PoseStamped>("/docking_direction", 1);
+      puber_docking_direction.publish(docking_direction_topic);
+      // ROS_INFO("docking_direction_topic pubed");
 
-      // geometry_msgs::PoseStamped v2_topic;
-      // v2_topic.header.frame_id = "map";
-      // v2_topic.pose.position.x = dummy_mark_pose.x();
-      // v2_topic.pose.position.y = dummy_mark_pose.y();
-      // v2_topic.pose.position.z = dummy_mark_pose.z();
-      // v2_topic.pose.orientation.x = v2.x();
-      // v2_topic.pose.orientation.y = v2.y();
-      // v2_topic.pose.orientation.z = v2.z();
-      // v2_topic.pose.orientation.w = v2.w();
-      // puber_v2 = ros_node.advertise<geometry_msgs::PoseStamped>("/pose/v2", 1);
-      // puber_v2.publish(v2_topic);
-      // ROS_INFO("pub v2");
 
       // axis();
       ros::spinOnce();
