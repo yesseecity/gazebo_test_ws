@@ -62,6 +62,12 @@
       </sensor>
     </link>
 
+    <joint type="fixed" name="base_joint">
+      <parent>base_link</parent>
+      <child>base_footprint</child>
+    </joint>
+
+    <!-- Wheel -->
     <link name="wheel_left">
       <pose>0 0.275 0.075 0 0 0</pose>
       <collision name="wheel_left_collision">
@@ -319,7 +325,8 @@
     </joint>
 
     <link name="camera_back">
-      <pose>-0.33 0 0.13 0 0 3.1416</pose>
+      <!-- <pose>-0.33 0 0.13 0 0 0</pose> -->
+      <pose>-0.33 0 0.13 0 0 3.14159265359</pose>
       <visual name="camera_back_visual">
         <geometry>
           <mesh>
@@ -375,6 +382,7 @@
       <parent>base_link</parent>
     </joint>
 
+    <!-- Caster -->
     <link name="caster_front">
       <pose>0.3 0 0.02 0 0 0 </pose>
       <collision name="caster_front_collision">
@@ -453,6 +461,7 @@
       <child>caster_back</child>
     </joint>
 
+    <!-- Electrode -->
     <link name="electrode_postive">
       <pose>0 0 0 0 0 0 </pose>
       <collision name="electrode_postive_collision">
@@ -544,11 +553,5 @@
       <child>electrode_negative</child>
       <parent>base_link</parent>
     </joint>
-
-    <joint type="fixed" name="base_joint">
-      <parent>base_link</parent>
-      <child>base_footprint</child>
-    </joint>
-
   </model>
 </sdf>
