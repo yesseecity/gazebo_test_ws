@@ -13,10 +13,16 @@
 #include <geometry_msgs/Point.h>
 #include <gazebo_msgs/ModelState.h>
 
+struct DirectionLine {
+  float gradient;  //斜率
+  float intercept; //截距
+};
+double M_2PI = M_PI*2;
+
 class DummyPoint {
   private:
     ros::NodeHandle ros_node;
-    ros::Publisher mark_pose_puber, cmd_vel_puber;
+    ros::Publisher model_pose_puber, cmd_vel_puber;
     ros::Subscriber tag_detections, odom;
     tf::StampedTransform  tf_car_pose;
     tf::StampedTransform  tf_tag_pose_a;
@@ -31,6 +37,10 @@ class DummyPoint {
     tf::Vector3 y_axis = tf::Vector3(0,1,0);
     tf::Vector3 z_axis = tf::Vector3(0,0,1);
     double car_yaw, dock_yaw;
+    tf::Vector3 cat_pose, intersection_point;
+    DirectionLine car_direction_line;
+    DirectionLine dock_direction_line;
+
   public:
     DummyPoint(ros::NodeHandle node) {
       ros_node = node;
@@ -39,7 +49,59 @@ class DummyPoint {
       tag_detections = ros_node.subscribe("/tag_detections", 60, &DummyPoint::move_direction_mark, this);
       tf_car_pose_listenser.waitForTransform("map", "agv_car/base_link", ros::Time(0), ros::Duration(3.0));
       odom = ros_node.subscribe("agv_car/odom", 1, &DummyPoint::get_car_pose, this);
+
+      main_process();
+      ros::spinOnce();
     }
+
+    void main_process() {
+      while ( dock_direction_line.gradient == 0 && dock_direction_line.intercept == 0 ) {
+        // #include <unistd.h>
+        ROS_INFO("dock_direction_line unset");
+        sleep(1);
+
+        ros::spinOnce();
+      }
+      
+      while (true) {
+        intersection_of_two_lines(dock_direction_line, car_direction_line);
+        move_intersection();
+
+        float distance = dummy_mark_pose.distance(intersection_point);
+        float robot_radius;
+        ros_node.getParam("docking/robot_radius", robot_radius);
+        float angle;
+        float angle_diff = dock_yaw-car_yaw;
+        if (angle_diff > M_PI) {
+          angle_diff -= M_2PI;
+          // angle = std::fmod(dock_yaw-car_yaw+M_PI*2 ,  M_PI*2);
+        } else if (angle_diff < M_PI*-1) {
+          angle_diff += M_2PI;
+        }
+        if (angle_diff > 0) {
+          angle = M_PI_4*-1;
+        } else {
+          angle = M_PI_4;
+        }
+        // ROS_INFO("-------------------");
+        // ROS_INFO("distance   : %10.6f", distance);
+        // ROS_INFO("angle_diff : %10.6f", angle_diff);
+        // ROS_INFO("angle      : %10.6f", angle);
+        if (distance < (robot_radius*2+0.2)) {
+          rotate_car(angle);
+        } else {
+          angle = 0.0;
+          rotate_car(angle);
+          ROS_INFO("rotate complete");
+          break;
+        }
+
+        sleep(0.2);
+        ros::spinOnce();
+      }
+
+    }
+
 
     void move_direction_mark(const apriltag_ros::AprilTagDetectionArray::ConstPtr& msg) {
       if (msg->detections.size() < 2) {
@@ -78,34 +140,13 @@ class DummyPoint {
       // ROS_INFO("theta {RAD: %10.6f, DEG: %10.6f}", theta, theta*180/M_PI);
       // ROS_INFO("d_yaw: %10.6f", dock_yaw);
       dock_direction.setRPY(0, 0, dock_yaw);
-		
-      gazebo_msgs::ModelState mark_state;
-      mark_state.model_name = "direction";
-      mark_state.pose.position.x = dummy_mark_pose.x();
-      mark_state.pose.position.y = dummy_mark_pose.y();
-      mark_state.pose.position.z = dummy_mark_pose.z()+0.1;
-      mark_state.pose.orientation.x = dock_direction.x();
-      mark_state.pose.orientation.y = dock_direction.y();
-      mark_state.pose.orientation.z = dock_direction.z();
-      mark_state.pose.orientation.w = dock_direction.w();
-      mark_pose_puber = ros_node.advertise<gazebo_msgs::ModelState>("/gazebo/set_model_state", 1);
-      mark_pose_puber.publish(mark_state);
+
+      dock_direction_line = linear_equation(dock_yaw, dummy_mark_pose.x(), dummy_mark_pose.y());
+      move_mark();
+      show_mark_pose();
 
 
-      geometry_msgs::PoseStamped docking_direction_topic;
-      docking_direction_topic.header.frame_id = "map";
-      docking_direction_topic.pose.position.x = dummy_mark_pose.x();
-      docking_direction_topic.pose.position.y = dummy_mark_pose.y();
-      docking_direction_topic.pose.position.z = dummy_mark_pose.z();
-      docking_direction_topic.pose.orientation.x = dock_direction.x();
-      docking_direction_topic.pose.orientation.y = dock_direction.y();
-      docking_direction_topic.pose.orientation.z = dock_direction.z();
-      docking_direction_topic.pose.orientation.w = dock_direction.w();
-      puber_docking_direction = ros_node.advertise<geometry_msgs::PoseStamped>("/docking_direction", 1);
-      puber_docking_direction.publish(docking_direction_topic);
-      // ROS_INFO("docking_direction_topic pubed");
-
-      rotate_car();
+      // rotate_car();
 
       // axis();
       ros::spinOnce();
@@ -119,54 +160,123 @@ class DummyPoint {
       double car_roll, car_pitch;
       tf::Matrix3x3 car_matrix( tf_car_pose.getRotation());
       car_matrix.getRPY(car_roll, car_pitch, car_yaw);
+      cat_pose = tf_car_pose.getOrigin();
+      car_direction_line = linear_equation(car_yaw, cat_pose.x(), cat_pose.y());
     }
 
+    DirectionLine linear_equation(float yaw, float x, float y) {
+      DirectionLine temp_line;
+      temp_line.gradient = tan(yaw);
+      temp_line.intercept = y - temp_line.gradient*x;
+      return temp_line;
+    }
+
+    void intersection_of_two_lines(DirectionLine& line1, DirectionLine& line2) {
+      float a1 = line1.gradient;
+      float b1 = line1.intercept;
+      float a2 = line2.gradient;
+      float b2 = line2.intercept;
+      float x,y;
+      x = (b2-b1)/(a1-a2);
+      y = x*a2+b2;
+      intersection_point.setX(x);
+      intersection_point.setY(y);
+    };
+
+    void move_mark() {
+      gazebo_msgs::ModelState mark_state;
+      mark_state.model_name = "direction";
+      mark_state.pose.position.x = dummy_mark_pose.x();
+      mark_state.pose.position.y = dummy_mark_pose.y();
+      mark_state.pose.position.z = dummy_mark_pose.z()+0.1;
+      mark_state.pose.orientation.x = dock_direction.x();
+      mark_state.pose.orientation.y = dock_direction.y();
+      mark_state.pose.orientation.z = dock_direction.z();
+      mark_state.pose.orientation.w = dock_direction.w();
+      model_pose_puber = ros_node.advertise<gazebo_msgs::ModelState>("/gazebo/set_model_state", 1);
+      model_pose_puber.publish(mark_state);
+    }
+
+    void move_intersection() {
+      gazebo_msgs::ModelState model_state;
+      model_state.model_name = "intersection_point";
+      model_state.pose.position.x = intersection_point.x();
+      model_state.pose.position.y = intersection_point.y();
+      model_state.pose.position.z = 0.38;
+      model_state.pose.orientation.x = 0;
+      model_state.pose.orientation.y = 0;
+      model_state.pose.orientation.z = 0;
+      model_state.pose.orientation.w = 1;
+      model_pose_puber = ros_node.advertise<gazebo_msgs::ModelState>("/gazebo/set_model_state", 1);
+      model_pose_puber.publish(model_state);
+    }
+
+    void show_mark_pose() {
+      geometry_msgs::PoseStamped docking_direction_topic;
+      docking_direction_topic.header.frame_id = "map";
+      docking_direction_topic.pose.position.x = dummy_mark_pose.x();
+      docking_direction_topic.pose.position.y = dummy_mark_pose.y();
+      docking_direction_topic.pose.position.z = dummy_mark_pose.z();
+      docking_direction_topic.pose.orientation.x = dock_direction.x();
+      docking_direction_topic.pose.orientation.y = dock_direction.y();
+      docking_direction_topic.pose.orientation.z = dock_direction.z();
+      docking_direction_topic.pose.orientation.w = dock_direction.w();
+      puber_docking_direction = ros_node.advertise<geometry_msgs::PoseStamped>("/docking_direction", 1);
+      puber_docking_direction.publish(docking_direction_topic);
+    }
+
+
     void rotate_car(){
-      tf::Quaternion init_direction = tf::Quaternion(0,0,0,1);
-      // tf_car_pose.getOrigin();
-      tf::Quaternion car_direction = tf_car_pose.getRotation();
       // * Quaternion.angle 永遠只有正的值
-     
-     
-      float angle_diffance = dock_yaw - car_yaw;
-
-      float abs_angle_diffance = fabs(angle_diffance);
+      float angle;
+      float angle_diff = dock_yaw - car_yaw;
+      if (angle_diff > M_PI) {
+        angle = angle_diff - M_2PI;
+        // angle = std::fmod(dock_yaw-car_yaw+M_PI*2 ,  M_PI*2);
+      } else if (angle_diff < M_PI*-1) {
+        angle = angle_diff + M_2PI;
+      } else {
+        angle = angle_diff;
+      }
       ROS_INFO_STREAM("-------------");
+      ROS_INFO("car_pose  : (%10.6f, %10.6f)", cat_pose.x(), cat_pose.y());
+      ROS_INFO("dock_pose : (%10.6f, %10.6f)", dummy_mark_pose.x(), dummy_mark_pose.y());
+      ROS_INFO("car_yaw   : {RAD: %10.6f ,DEG: %10.6f", car_yaw, car_yaw*180/M_PI);
+      ROS_INFO("dock_yaw  : {RAD: %10.6f ,DEG: %10.6f", dock_yaw, dock_yaw*180/M_PI);
+      ROS_INFO("angle     : %10.6f", angle);
+      rotate_car(angle);
+    }
 
-      ROS_INFO("car_yaw   : %10.6f", car_yaw);
-      ROS_INFO("dock_yaw  : %10.6f", dock_yaw);
-      ROS_INFO("angle_diffance     : %10.6f", angle_diffance);
-
-
+    void rotate_car(float& angle) {
+      float abs_angle = fabs(angle);
       geometry_msgs::Twist cmd_vel;
       float M_PI_8 = 0.392699082;
-      if (abs_angle_diffance < 0.01) {
+      if (abs_angle < 0.05) {
         cmd_vel.angular.z = 0.0;
         cmd_vel.linear.x = 0.0;
-      } else if (abs_angle_diffance < M_PI_4) {
+      } else if (abs_angle < M_PI_4) {
         float angular_z = M_PI_8/2;
         // cmd_vel.linear.x = -0.1;
-        if (angle_diffance > 0) {
+        if (angle > 0) {
           cmd_vel.angular.z = angular_z;
         } else {
           cmd_vel.angular.z = angular_z * -1;
         }
-      } else if (abs_angle_diffance < M_PI_2) {
+      } else if (abs_angle < M_PI_2) {
         // cmd_vel.linear.x = -0.3;
-        if (angle_diffance > 0) {
+        if (angle > 0) {
           cmd_vel.angular.z = M_PI_8;
         } else {
           cmd_vel.angular.z = M_PI_8 * -1;
         }
-      } else if (abs_angle_diffance >= M_PI_2) {
+      } else if (abs_angle >= M_PI_2) {
         // cmd_vel.linear.x = -0.4;
-        if (angle_diffance > 0) {
+        if (angle > 0) {
           cmd_vel.angular.z = M_PI_4;
         } else {
           cmd_vel.angular.z = M_PI_4 * -1;
         }
       }
-      ROS_INFO("angular.z : %10.6f", cmd_vel.angular.z);
       cmd_vel_puber = ros_node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
       cmd_vel_puber.publish(cmd_vel);
     }

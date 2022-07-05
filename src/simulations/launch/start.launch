@@ -56,4 +56,5 @@
 
   <!-- <node pkg="simulations" name="electrode-contact" type="electrode-contact.py" /> -->
 
+  <rosparam param="docking/robot_radius">0.4</rosparam>
 </launch>

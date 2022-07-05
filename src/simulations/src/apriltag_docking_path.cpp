@@ -2,16 +2,24 @@
 #include <dummy_point.h>
 
 int main(int argc, char** argv) {
-  
   ros::init(argc, argv, "apriltag_docking");
+  
   ros::NodeHandle node;
+  DummyPoint dummyPoint(node);
+
   float offset=0.4;
   // ApriltagDockingPath AdockingPath(node, offset);
-  DummyPoint dummyPoint(node);
+  dummyPoint.start();
   ros::spin();
 
   return 0;
 };
+
+
+
+
+
+
 
 //
 //  roslaunch simulations start.launch 
