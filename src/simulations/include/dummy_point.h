@@ -12,12 +12,14 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Point.h>
 #include <gazebo_msgs/ModelState.h>
+#include <std_srvs/Empty.h>
 
 struct DirectionLine {
   float gradient;  //斜率
   float intercept; //截距
 };
 double M_2PI = M_PI*2;
+std_srvs::Empty empty;
 
 class DummyPoint {
   private:
@@ -46,6 +48,9 @@ class DummyPoint {
       ros_node = node;
     };
     void start() {
+      // ros::service::call("/gazebo/reset_world", empty);
+      // ros::service::call("/gazebo/reset_simulation", empty);
+
       tag_detections = ros_node.subscribe("/tag_detections", 60, &DummyPoint::move_direction_mark, this);
       tf_car_pose_listenser.waitForTransform("map", "agv_car/base_link", ros::Time(0), ros::Duration(3.0));
       odom = ros_node.subscribe("agv_car/odom", 1, &DummyPoint::get_car_pose, this);
@@ -55,21 +60,22 @@ class DummyPoint {
     }
 
     void main_process() {
+      //* 等待充電站 tag被掃到
       while ( dock_direction_line.gradient == 0 && dock_direction_line.intercept == 0 ) {
-        // #include <unistd.h>
         ROS_INFO("dock_direction_line unset");
         sleep(1);
 
         ros::spinOnce();
       }
       
-      while (true) {
-        intersection_of_two_lines(dock_direction_line, car_direction_line);
-        move_intersection();
-
+      //* 開始移動前的調角度
+      //  確保車子移動到充電站的法線後的旋轉不會撞到
+      std::cout<<"開始移動前的調角度"<<std::endl;
+      float robot_radius;
+      ros_node.getParam("docking/robot_radius", robot_radius);
+      intersection_of_two_lines(dock_direction_line, car_direction_line);
+      while (1) {
         float distance = dummy_mark_pose.distance(intersection_point);
-        float robot_radius;
-        ros_node.getParam("docking/robot_radius", robot_radius);
         float angle;
         float angle_diff = dock_yaw-car_yaw;
         if (angle_diff > M_PI) {
@@ -78,28 +84,132 @@ class DummyPoint {
         } else if (angle_diff < M_PI*-1) {
           angle_diff += M_2PI;
         }
-        if (angle_diff > 0) {
-          angle = M_PI_4*-1;
+
+        float distance_diff = 0.0;
+        if (distance < (robot_radius*2+0.5)) {
+          distance_diff = robot_radius*2+0.5 - distance;
+          angle = 0.6;
+          ROS_INFO("-------------------");
+          ROS_INFO("distance_diff   : %10.6f", distance_diff);
+          if (distance_diff < 0.3 && distance_diff >= 0.2) {
+            angle = 0.2;
+          } else if (distance_diff < 0.2 && distance_diff >= 0.1) {
+            angle = 0.09;
+          } else if (distance_diff < 0.1) {
+            angle = 0.04;
+          }
+          if (angle_diff > 0) {
+            angle *= -1;
+          }
+          double target_yaw = car_yaw + angle;
+          rotate_car_to_target(target_yaw);
         } else {
-          angle = M_PI_4;
-        }
-        // ROS_INFO("-------------------");
-        // ROS_INFO("distance   : %10.6f", distance);
-        // ROS_INFO("angle_diff : %10.6f", angle_diff);
-        // ROS_INFO("angle      : %10.6f", angle);
-        if (distance < (robot_radius*2+0.2)) {
-          rotate_car(angle);
-        } else {
-          angle = 0.0;
-          rotate_car(angle);
+          rotate_car_to_target();
+          geometry_msgs::Twist cmd_vel;
+          cmd_vel_puber = ros_node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+          cmd_vel_puber.publish(cmd_vel);
           ROS_INFO("rotate complete");
           break;
         }
 
-        sleep(0.2);
+        intersection_of_two_lines(dock_direction_line, car_direction_line);
         ros::spinOnce();
       }
 
+      // ros::service::call("/gazebo/pause_physics", empty);
+
+      // return;
+      //* 開始移動到充電站的法線
+      std::cout<<"開始移動到充電站的法線"<<std::endl;
+      float previous_distance = 0.0;
+      float intersection_point_offset;
+      ros_node.getParam("docking/intersection_point_offset", intersection_point_offset);
+      previous_distance = cat_pose.distance(intersection_point);
+      while (1) {
+        float distance = cat_pose.distance(intersection_point);
+        if (distance < 0.2) {
+          ROS_INFO("--------------------------");
+          ROS_INFO("distance:                  %12.8f", distance);
+          ROS_INFO("previous_distance:         %12.8f", previous_distance);
+          ROS_INFO("intersection_point_offset: %12.8f", intersection_point_offset);
+        }
+
+        if (distance > previous_distance && distance < 0.1) {
+          move_car(0.0);
+          ros::spinOnce();
+          break;
+        } else {
+          previous_distance = distance;
+        }
+        if (distance > intersection_point_offset) {
+          move_car(distance);
+        } else {
+          move_car(0.0);
+          ros::spinOnce();
+          break;
+        }
+
+        ros::spinOnce();
+      }
+
+      // return;
+      // sleep(2);
+      std::cout<<"調角度"<<std::endl;
+      float max_angle_diff;
+      ros_node.getParam("docking/max_angle_diff", max_angle_diff);
+      while (1) {
+        float angle;
+        float angle_diff = dock_yaw - car_yaw;
+        if (angle_diff > M_PI) {
+          angle = angle_diff - M_2PI;
+          // angle = std::fmod(dock_yaw-car_yaw+M_PI*2 ,  M_PI*2);
+        } else if (angle_diff < M_PI*-1) {
+          angle = angle_diff + M_2PI;
+        } else {
+          angle = angle_diff;
+        }
+        if (max_angle_diff < fabs(angle)) {
+          rotate_car(angle);
+        } else {
+          angle = 0.0;
+          rotate_car(angle);
+          break;
+        }
+
+        ros::spinOnce();
+      }
+
+      //* 開始移動到充電站
+      std::cout<<"開始移動到充電站"<<std::endl;
+      previous_distance = 0.0;
+      previous_distance = cat_pose.distance(dummy_mark_pose);
+      while (1) {
+        float distance = cat_pose.distance(dummy_mark_pose);
+        if (distance < 0.2) {
+          ROS_INFO("--------------------------");
+          ROS_INFO("distance:                  %12.8f", distance);
+          ROS_INFO("previous_distance:         %12.8f", previous_distance);
+          ROS_INFO("intersection_point_offset: %12.8f", intersection_point_offset);
+        }
+
+        if (distance > previous_distance && distance < 0.1) {
+          move_car(0.0);
+          ros::spinOnce();
+          break;
+        } else {
+          previous_distance = distance;
+        }
+        if (distance > intersection_point_offset + 0.5) {
+          move_car(distance);
+        } else {
+          move_car(0.0);
+          ros::spinOnce();
+          break;
+        }
+
+        ros::spinOnce();
+      }
+      std::cout<<"Done"<<std::endl;
     }
 
 
@@ -147,6 +257,7 @@ class DummyPoint {
 
 
       // rotate_car();
+      // rotate_car_to_target(dock_yaw);
 
       // axis();
       ros::spinOnce();
@@ -181,6 +292,8 @@ class DummyPoint {
       y = x*a2+b2;
       intersection_point.setX(x);
       intersection_point.setY(y);
+
+      move_intersection();
     };
 
     void move_mark() {
@@ -225,14 +338,32 @@ class DummyPoint {
       puber_docking_direction.publish(docking_direction_topic);
     }
 
+    void move_car(float distance) {
+      ROS_INFO("move_car distance: %10.6f", distance);
+      geometry_msgs::Twist cmd_vel;
+      if (distance < 0.005 ) {
+        cmd_vel.linear.x = 0;
+      } else if (distance < 0.1 ) {
+        cmd_vel.linear.x = -0.15;
+      // } else if (distance < 0.2 ) {
+      //   cmd_vel.linear.x = -0.1;
+      } else if (distance < 0.3 ) {
+        cmd_vel.linear.x = -0.2;
+      } else if (distance < 0.6 ) {
+        cmd_vel.linear.x = -0.3;
+      } else {
+        cmd_vel.linear.x = -0.5;
+      }
+      cmd_vel_puber = ros_node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+      cmd_vel_puber.publish(cmd_vel);
+    }
 
     void rotate_car(){
-      // * Quaternion.angle 永遠只有正的值
+      //* Quaternion.angle 永遠只有正的值
       float angle;
       float angle_diff = dock_yaw - car_yaw;
       if (angle_diff > M_PI) {
         angle = angle_diff - M_2PI;
-        // angle = std::fmod(dock_yaw-car_yaw+M_PI*2 ,  M_PI*2);
       } else if (angle_diff < M_PI*-1) {
         angle = angle_diff + M_2PI;
       } else {
@@ -246,36 +377,89 @@ class DummyPoint {
       ROS_INFO("angle     : %10.6f", angle);
       rotate_car(angle);
     }
-
     void rotate_car(float& angle) {
+      float max_angle_diff;
+      ros_node.getParam("docking/max_angle_diff", max_angle_diff);
       float abs_angle = fabs(angle);
+      // ROS_INFO("rotate_car abs_angle: %10.6f", abs_angle);
+      ROS_INFO("rotate_car angle: %10.6f", angle);
       geometry_msgs::Twist cmd_vel;
-      float M_PI_8 = 0.392699082;
-      if (abs_angle < 0.05) {
+      if (abs_angle < max_angle_diff) {
         cmd_vel.angular.z = 0.0;
         cmd_vel.linear.x = 0.0;
-      } else if (abs_angle < M_PI_4) {
-        float angular_z = M_PI_8/2;
-        // cmd_vel.linear.x = -0.1;
+      } else if (abs_angle < 0.3) {
+        float angular_z = 0.4;
         if (angle > 0) {
           cmd_vel.angular.z = angular_z;
         } else {
           cmd_vel.angular.z = angular_z * -1;
         }
-      } else if (abs_angle < M_PI_2) {
-        // cmd_vel.linear.x = -0.3;
+      } else if (abs_angle < 0.8) {
+        float angular_z = 0.6;
         if (angle > 0) {
-          cmd_vel.angular.z = M_PI_8;
+          cmd_vel.angular.z = angular_z;
         } else {
-          cmd_vel.angular.z = M_PI_8 * -1;
+          cmd_vel.angular.z = angular_z * -1;
         }
-      } else if (abs_angle >= M_PI_2) {
-        // cmd_vel.linear.x = -0.4;
+      } else if (abs_angle >= 0.8) {
+        float angular_z = 0.8;
         if (angle > 0) {
-          cmd_vel.angular.z = M_PI_4;
+          cmd_vel.angular.z = angular_z;
         } else {
-          cmd_vel.angular.z = M_PI_4 * -1;
+          cmd_vel.angular.z = angular_z * -1;
         }
+      }
+      cmd_vel_puber = ros_node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+      cmd_vel_puber.publish(cmd_vel);
+    }
+
+    void rotate_car_to_target() {
+      geometry_msgs::Twist cmd_vel;
+      cmd_vel.angular.z = 0.0;
+      cmd_vel.linear.x = 0.0;
+      cmd_vel_puber = ros_node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+      cmd_vel_puber.publish(cmd_vel);
+    }
+    void rotate_car_to_target(double& target_yaw) {
+      float angle;
+      float angle_diff = target_yaw - car_yaw;
+      if (angle_diff > M_PI) {
+        angle = angle_diff - M_2PI;
+      } else if (angle_diff < M_PI*-1) {
+        angle = angle_diff + M_2PI;
+      } else {
+        angle = angle_diff;
+      }
+
+      float max_angle_diff;
+      ros_node.getParam("docking/max_angle_diff", max_angle_diff);
+
+      float abs_angle = fabs(angle);
+      // ROS_INFO("rotate_car abs_angle: %10.6f", abs_angle);
+      ROS_INFO("rotate_car angle: %10.6f", angle);
+      geometry_msgs::Twist cmd_vel;
+      float angular_z = 0.0;
+      if (abs_angle < max_angle_diff) {
+        cmd_vel.angular.z = 0.0;
+        cmd_vel.linear.x = 0.0;
+      } else if (abs_angle <= 0.051) {
+        angular_z = 0.2;
+      } else if (abs_angle <= 0.101 && abs_angle > 0.051) {
+        angular_z = 0.3;
+      } else if (abs_angle <= 0.301 && abs_angle > 0.101 ) {
+        angular_z = 0.4;
+      } else if (abs_angle <= 0.401 && abs_angle > 0.301 ) {
+        angular_z = 0.5;
+      } else if (abs_angle <= 0.801 && abs_angle > 0.401) {
+        angular_z = 0.6;
+      } else if (abs_angle > 0.8) {
+        angular_z = 0.8;
+      }
+
+      if (angle > 0) {
+        cmd_vel.angular.z = angular_z;
+      } else {
+        cmd_vel.angular.z = angular_z * -1;
       }
       cmd_vel_puber = ros_node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
       cmd_vel_puber.publish(cmd_vel);
